@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,9 +14,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
-    FolderKanban,
     LayoutDashboard,
-    BarChart,
     Users,
     Settings,
     LogOut,
@@ -28,6 +25,8 @@ import {
     Bell,
     HelpCircle,
     ChevronLeft,
+    Building2,
+    Key,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -37,20 +36,28 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import type { Session } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 
-const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-};
+interface SidebarProps {
+    user: Session;
+    isMobile?: boolean;
+}
 
-export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
+export function Sidebar({ user, isMobile = false }: SidebarProps) {
+    const { logout } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false);
 
     const handleLogout = async () => {
-        //await logoutAction();
+        await logout();
         router.push("/login");
+        router.refresh();
+    };
+
+    const handleNavigation = (href: string) => {
+        router.push(href);
     };
 
     const navItems = [
@@ -59,19 +66,24 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
             href: "/dashboard",
             icon: LayoutDashboard,
         },
+        // {
+        //     title: "Projects",
+        //     href: "/dashboard/projects",
+        //     icon: FolderKanban,
+        // },
+        // {
+        //     title: "Analytics",
+        //     href: "/dashboard/analytics",
+        //     icon: BarChart,
+        // },
         {
-            title: "Projects",
-            href: "/dashboard/projects",
-            icon: FolderKanban,
-        },
-        {
-            title: "Analytics",
-            href: "/dashboard/analytics",
-            icon: BarChart,
+            title: "Companies",
+            href: "/companies",
+            icon: Building2,
         },
         {
             title: "Users",
-            href: "/dashboard/users",
+            href: "/users",
             icon: Users,
         },
         {
@@ -84,7 +96,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     return (
         <TooltipProvider delayDuration={0}>
             <div className="relative">
-                {/* Toggle Button - Positioned to stay visible */}
+                {/* Toggle Button - Only show on desktop */}
                 {!isMobile && (
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -114,21 +126,19 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                 >
                     {/* Header */}
                     <div className="flex h-16 items-center justify-start border-b px-4">
-                        <div className="flex items-center gap-3">
+                        <div
+                            className="flex items-center gap-3"
+                            onClick={() => handleNavigation("/dashboard")}
+                        >
                             <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
-                                <Link
-                                    href={"/"}
-                                    className={cn(
-                                        "group relative flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                    )}
-                                >
-                                    <Home className="h-5 w-5 text-primary" />
-                                </Link>
+                                <Home className="h-5 w-5 text-primary" />
                             </div>
                             <h1
                                 className={cn(
                                     "text-xl font-bold tracking-tight transition-opacity duration-300",
-                                    collapsed ? "opacity-0 w-0" : "opacity-100"
+                                    !isMobile && collapsed
+                                        ? "opacity-0 w-0"
+                                        : "opacity-100"
                                 )}
                             >
                                 Hi Tradies
@@ -144,10 +154,12 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                 return (
                                     <Tooltip key={item.href}>
                                         <TooltipTrigger asChild>
-                                            <Link
-                                                href={item.href}
+                                            <button
+                                                onClick={() =>
+                                                    handleNavigation(item.href)
+                                                }
                                                 className={cn(
-                                                    "group relative flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                                                    "group relative flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200",
                                                     isActive
                                                         ? "bg-primary/10 text-primary"
                                                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -156,7 +168,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                                 <item.icon
                                                     className={cn(
                                                         "h-5 w-5 shrink-0 transition-all",
-                                                        collapsed
+                                                        !isMobile && collapsed
                                                             ? "mr-0"
                                                             : "mr-3",
                                                         isActive
@@ -167,7 +179,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                                 <span
                                                     className={cn(
                                                         "truncate transition-opacity duration-300",
-                                                        collapsed
+                                                        !isMobile && collapsed
                                                             ? "opacity-0 w-0"
                                                             : "opacity-100"
                                                     )}
@@ -177,9 +189,9 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                                 {isActive && (
                                                     <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-md" />
                                                 )}
-                                            </Link>
+                                            </button>
                                         </TooltipTrigger>
-                                        {collapsed && (
+                                        {!isMobile && collapsed && (
                                             <TooltipContent side="right">
                                                 {item.title}
                                             </TooltipContent>
@@ -199,7 +211,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                         <div
                                             className={cn(
                                                 "flex items-center gap-3 rounded-md p-2 hover:bg-muted/50 transition-all cursor-pointer",
-                                                collapsed
+                                                !isMobile && collapsed
                                                     ? "justify-center"
                                                     : "justify-start"
                                             )}
@@ -209,20 +221,21 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                                     {user.name.charAt(0)}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            {!collapsed && (
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium">
-                                                        {user.name}
-                                                    </span>
-                                                    <span className="text-xs text-muted-foreground truncate max-w-[160px]">
-                                                        {user.email}
-                                                    </span>
-                                                </div>
-                                            )}
+                                            {(!isMobile || isMobile) &&
+                                                (!collapsed || isMobile) && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium">
+                                                            {user.name}
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground truncate max-w-[160px]">
+                                                            {user.email}
+                                                        </span>
+                                                    </div>
+                                                )}
                                         </div>
                                     </DropdownMenuTrigger>
                                 </TooltipTrigger>
-                                {collapsed && (
+                                {!isMobile && collapsed && (
                                     <TooltipContent side="right">
                                         <div>
                                             <p className="font-medium">
@@ -252,7 +265,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem
                                         onClick={() =>
-                                            router.push("/dashboard/profile")
+                                            handleNavigation("/profile")
                                         }
                                     >
                                         <User className="mr-2 h-4 w-4" />
@@ -260,7 +273,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() =>
-                                            router.push("/dashboard/account")
+                                            handleNavigation("/account")
                                         }
                                     >
                                         <UserCog className="mr-2 h-4 w-4" />
@@ -268,7 +281,15 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() =>
-                                            router.push("/dashboard/billing")
+                                            handleNavigation("/change-password")
+                                        }
+                                    >
+                                        <Key className="mr-2 h-4 w-4" />
+                                        <span>Change Password</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            handleNavigation("/billing")
                                         }
                                     >
                                         <CreditCard className="mr-2 h-4 w-4" />
@@ -279,9 +300,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem
                                         onClick={() =>
-                                            router.push(
-                                                "/dashboard/notifications"
-                                            )
+                                            handleNavigation("/notifications")
                                         }
                                     >
                                         <Bell className="mr-2 h-4 w-4" />
@@ -294,7 +313,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() =>
-                                            router.push("/dashboard/help")
+                                            handleNavigation("/help")
                                         }
                                     >
                                         <HelpCircle className="mr-2 h-4 w-4" />
