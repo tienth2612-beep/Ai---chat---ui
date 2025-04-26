@@ -23,7 +23,7 @@ export default async function ProtectedLayout({
         <div className="flex h-screen overflow-hidden bg-background">
             {/* Desktop Sidebar - Hidden on mobile */}
             <div className="hidden md:block">
-                <Sidebar user={session} />
+                <Sidebar user={session || undefined} />
             </div>
 
             <div className="flex flex-1 flex-col overflow-hidden">
@@ -45,7 +45,10 @@ export default async function ProtectedLayout({
                                 <SheetTitle className="sr-only">
                                     Navigation Menu
                                 </SheetTitle>
-                                <Sidebar user={session} isMobile={true} />
+                                <Sidebar
+                                    user={session || undefined}
+                                    isMobile={true}
+                                />
                             </SheetContent>
                         </Sheet>
                         <h1 className="text-xl font-bold">

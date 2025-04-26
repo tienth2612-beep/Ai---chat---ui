@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { MoreHorizontal, View } from "lucide-react";
 
@@ -30,8 +29,8 @@ interface CompanyTableProps {
 export function CompanyTable({
     companies: initialCompanies,
 }: CompanyTableProps) {
-    const [companies, setCompanies] = useState(initialCompanies);
-
+    //const [companies, setCompanies] = useState(initialCompanies);
+    const companies = initialCompanies;
     return (
         <div className="rounded-md border">
             <Table>

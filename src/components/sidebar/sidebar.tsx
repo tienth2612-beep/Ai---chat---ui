@@ -40,7 +40,7 @@ import type { Session } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
 
 interface SidebarProps {
-    user: Session;
+    user: Session | undefined;
     isMobile?: boolean;
 }
 
@@ -145,7 +145,6 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                             </h1>
                         </div>
                     </div>
-
                     {/* Navigation */}
                     <div className="sidebar-scrollbar flex-1 overflow-y-auto py-6">
                         <nav className="space-y-1 px-3">
@@ -201,8 +200,8 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                             })}
                         </nav>
                     </div>
-
                     {/* Footer with User Profile */}
+                    (user &&
                     <div className="border-t p-4">
                         <DropdownMenu>
                             <Tooltip>
@@ -218,17 +217,17 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                         >
                                             <Avatar className="h-10 w-10 border-2 border-primary/10">
                                                 <AvatarFallback className="bg-primary/10 text-primary">
-                                                    {user.name.charAt(0)}
+                                                    {user?.name.charAt(0)}
                                                 </AvatarFallback>
                                             </Avatar>
                                             {(!isMobile || isMobile) &&
                                                 (!collapsed || isMobile) && (
                                                     <div className="flex flex-col">
                                                         <span className="text-sm font-medium">
-                                                            {user.name}
+                                                            {user?.name}
                                                         </span>
                                                         <span className="text-xs text-muted-foreground truncate max-w-[160px]">
-                                                            {user.email}
+                                                            {user?.email}
                                                         </span>
                                                     </div>
                                                 )}
@@ -239,10 +238,10 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                     <TooltipContent side="right">
                                         <div>
                                             <p className="font-medium">
-                                                {user.name}
+                                                {user?.name}
                                             </p>
                                             <p className="text-xs text-muted-foreground">
-                                                {user.email}
+                                                {user?.email}
                                             </p>
                                         </div>
                                     </TooltipContent>
@@ -331,6 +330,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
+                    )
                 </div>
             </div>
         </TooltipProvider>

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import {
     Card,
     CardContent,
@@ -8,15 +7,10 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { getCurrentUser } from "@/lib/auth";
+//import { getCurrentUser } from "@/lib/auth";
 
-export const metadata: Metadata = {
-    title: "Account Settings",
-    description: "Manage your account settings and preferences",
-};
-
-export default async function AccountPage() {
-    const user = await getCurrentUser();
+export default function AccountPage() {
+    //const user =  getCurrentUser();
 
     return (
         <div className="space-y-6">

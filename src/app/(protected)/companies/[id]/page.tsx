@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import {
     Table,
     TableBody,
@@ -8,26 +7,32 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { companyAction } from "@/lib/actions/company.action";
+import { Metadata } from "next";
 
-interface ViewEmployees {
-    params: {
-        id: number;
-    };
-}
-export default async function ViewEmployees({ params }: ViewEmployees) {
-    const company = await companyAction.getCompanyDetail(params.id);
-    const employees = await companyAction.getEmployeesByCompanyId(params.id);
+export const metadata: Metadata = {
+    title: "Company Employees",
+};
 
-    console.log(employees);
-    if (!employees || employees.length == 0) {
-        notFound();
-    }
+type Props = {
+    params: Promise<{ id: string }>;
+};
+
+export default async function ViewEmployees({ params }: Props) {
+    const resolvedParams = await params;
+    const company = await companyAction.getCompanyDetail(
+        parseInt(resolvedParams.id)
+    );
+    const employees = await companyAction.getEmployeesByCompanyId(
+        parseInt(resolvedParams.id)
+    );
+
     return (
         <div>
             <div className="flex-1 space-y-4 p-8 pt-6">
                 <div className="flex items-center justify-between space-y-2">
                     <h2 className="text-3xl font-bold tracking-tight">
-                        Users of company {company?.name}
+                        Users of company {company?.Name}
                     </h2>
                 </div>
             </div>

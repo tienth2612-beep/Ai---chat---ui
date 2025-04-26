@@ -30,3 +30,15 @@ export interface PageResult<T> {
     pageNumber: number;
     pageSize: number;
 }
+// For service errors
+export interface ServiceError extends Error {
+    response?: {
+        data: ApiError;
+        status: number;
+    };
+}
+export interface ApiError {
+    message: string;
+    status: number;
+    errors?: Record<string, string[]>;
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { UserForm } from "@/components/users/user-form";
+//import { UserForm } from "@/components/users/user-form";
 
 export const metadata: Metadata = {
     title: "Create User",
@@ -14,9 +14,7 @@ export default function NewUserPage() {
                     Create User
                 </h2>
             </div>
-            <div className="grid gap-4">
-                <UserForm />
-            </div>
+            <div className="grid gap-4">{/* <UserForm /> */}</div>
         </div>
     );
 }
