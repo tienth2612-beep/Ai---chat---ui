@@ -1,10 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuthCheck } from "@/hooks/use-auth-check";
 
 export default function HomePage() {
-    const { user, isLoading } = useAuth();
+    const { isLoading, user } = useAuthCheck();
     const router = useRouter();
 
     useEffect(() => {

@@ -201,136 +201,145 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                         </nav>
                     </div>
                     {/* Footer with User Profile */}
-                    (user &&
-                    <div className="border-t p-4">
-                        <DropdownMenu>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <div
-                                            className={cn(
-                                                "flex items-center gap-3 rounded-md p-2 hover:bg-muted/50 transition-all cursor-pointer",
-                                                !isMobile && collapsed
-                                                    ? "justify-center"
-                                                    : "justify-start"
-                                            )}
-                                        >
-                                            <Avatar className="h-10 w-10 border-2 border-primary/10">
-                                                <AvatarFallback className="bg-primary/10 text-primary">
-                                                    {user?.name?.charAt(0)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            {(!isMobile || isMobile) &&
-                                                (!collapsed || isMobile) && (
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-medium">
-                                                            {user?.name}
-                                                        </span>
-                                                        <span className="text-xs text-muted-foreground truncate max-w-[160px]">
-                                                            {user?.email}
-                                                        </span>
-                                                    </div>
+                    {user && (
+                        <div className="border-t p-4">
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                            <div
+                                                className={cn(
+                                                    "flex items-center gap-3 rounded-md p-2 hover:bg-muted/50 transition-all cursor-pointer",
+                                                    !isMobile && collapsed
+                                                        ? "justify-center"
+                                                        : "justify-start"
                                                 )}
-                                        </div>
-                                    </DropdownMenuTrigger>
-                                </TooltipTrigger>
-                                {!isMobile && collapsed && (
-                                    <TooltipContent side="right">
-                                        <div>
-                                            <p className="font-medium">
-                                                {user?.name}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">
-                                                {user?.email}
-                                            </p>
-                                        </div>
-                                    </TooltipContent>
-                                )}
-                            </Tooltip>
-                            <DropdownMenuContent
-                                className="w-56"
-                                align={
-                                    !isMobile && collapsed ? "center" : "start"
-                                }
-                                side={
-                                    !isMobile && collapsed ? "right" : "bottom"
-                                }
-                                sideOffset={!isMobile && collapsed ? 20 : 5}
-                            >
-                                <DropdownMenuLabel>
-                                    My Account
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleNavigation("/profile")
-                                        }
-                                    >
-                                        <User className="mr-2 h-4 w-4" />
-                                        <span>View Profile</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleNavigation("/account")
-                                        }
-                                    >
-                                        <UserCog className="mr-2 h-4 w-4" />
-                                        <span>Account Settings</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleNavigation("/change-password")
-                                        }
-                                    >
-                                        <Key className="mr-2 h-4 w-4" />
-                                        <span>Change Password</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleNavigation("/billing")
-                                        }
-                                    >
-                                        <CreditCard className="mr-2 h-4 w-4" />
-                                        <span>Billing</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleNavigation("/notifications")
-                                        }
-                                    >
-                                        <Bell className="mr-2 h-4 w-4" />
-                                        <span>Notifications</span>
-                                        <DropdownMenuShortcut>
-                                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-                                                3
-                                            </span>
-                                        </DropdownMenuShortcut>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleNavigation("/help")
-                                        }
-                                    >
-                                        <HelpCircle className="mr-2 h-4 w-4" />
-                                        <span>Help & Support</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    className="text-destructive focus:text-destructive"
-                                    onClick={handleLogout}
+                                            >
+                                                <Avatar className="h-10 w-10 border-2 border-primary/10">
+                                                    <AvatarFallback className="bg-primary/10 text-primary">
+                                                        {user?.name?.charAt(0)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                {(!isMobile || isMobile) &&
+                                                    (!collapsed ||
+                                                        isMobile) && (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-medium">
+                                                                {user?.name}
+                                                            </span>
+                                                            <span className="text-xs text-muted-foreground truncate max-w-[160px]">
+                                                                {user?.email}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                            </div>
+                                        </DropdownMenuTrigger>
+                                    </TooltipTrigger>
+                                    {!isMobile && collapsed && (
+                                        <TooltipContent side="right">
+                                            <div>
+                                                <p className="font-medium">
+                                                    {user?.name}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {user?.email}
+                                                </p>
+                                            </div>
+                                        </TooltipContent>
+                                    )}
+                                </Tooltip>
+                                <DropdownMenuContent
+                                    className="w-56"
+                                    align={
+                                        !isMobile && collapsed
+                                            ? "center"
+                                            : "start"
+                                    }
+                                    side={
+                                        !isMobile && collapsed
+                                            ? "right"
+                                            : "bottom"
+                                    }
+                                    sideOffset={!isMobile && collapsed ? 20 : 5}
                                 >
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Log out</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                    )
+                                    <DropdownMenuLabel>
+                                        My Account
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                handleNavigation("/profile")
+                                            }
+                                        >
+                                            <User className="mr-2 h-4 w-4" />
+                                            <span>View Profile</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                handleNavigation("/account")
+                                            }
+                                        >
+                                            <UserCog className="mr-2 h-4 w-4" />
+                                            <span>Account Settings</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                handleNavigation(
+                                                    "/change-password"
+                                                )
+                                            }
+                                        >
+                                            <Key className="mr-2 h-4 w-4" />
+                                            <span>Change Password</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                handleNavigation("/billing")
+                                            }
+                                        >
+                                            <CreditCard className="mr-2 h-4 w-4" />
+                                            <span>Billing</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                handleNavigation(
+                                                    "/notifications"
+                                                )
+                                            }
+                                        >
+                                            <Bell className="mr-2 h-4 w-4" />
+                                            <span>Notifications</span>
+                                            <DropdownMenuShortcut>
+                                                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+                                                    3
+                                                </span>
+                                            </DropdownMenuShortcut>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                handleNavigation("/help")
+                                            }
+                                        >
+                                            <HelpCircle className="mr-2 h-4 w-4" />
+                                            <span>Help & Support</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        className="text-destructive focus:text-destructive"
+                                        onClick={handleLogout}
+                                    >
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        <span>Log out</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    )}
                 </div>
             </div>
         </TooltipProvider>

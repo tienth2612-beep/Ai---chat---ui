@@ -13,10 +13,10 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/sidebar/sidebar";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuthCheck } from "@/hooks/use-auth-check";
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
-    const { user, isLoading } = useAuth();
+    const { user, isLoading } = useAuthCheck();
     const router = useRouter();
 
     useEffect(() => {
