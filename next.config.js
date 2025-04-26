@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    output: 'export',
+    distDir: 'build/client',
     async rewrites() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         // If no API URL is set, return empty rewrites array
