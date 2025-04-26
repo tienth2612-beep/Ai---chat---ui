@@ -13,6 +13,16 @@ const nextConfig = {
     },
     output: 'export',
     distDir: 'build/client',
+    // Add assetPrefix for static export
+    assetPrefix: process.env.NODE_ENV === 'production' ? './' : '',
+    // Ensure CSS is properly handled
+    webpack: (config) => {
+        config.module.rules.push({
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader'],
+        });
+        return config;
+    },
     async rewrites() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         // If no API URL is set, return empty rewrites array
