@@ -1,10 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     async rewrites() {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        // If no API URL is set, return empty rewrites array
+        if (!apiUrl) {
+            console.warn('NEXT_PUBLIC_API_URL is not set');
+            return [];
+        }
+        // Ensure the API URL ends with a slash
+        const baseUrl = apiUrl.endsWith('/') ? apiUrl : `${apiUrl}/`;
         return [
             {
                 source: '/api/:path*',
-                destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+                destination: `${baseUrl}:path*`,
             },
         ];
     },
