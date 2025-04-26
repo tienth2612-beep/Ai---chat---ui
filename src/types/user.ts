@@ -17,10 +17,8 @@ export interface User {
     name: string;
     email: string;
     role: string;
-    membership: string;
-    status: string;
-    companyId: number;
-    createdAt: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface UserResponse {

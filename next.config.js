@@ -1,49 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-        remotePatterns: [
-            {
-                protocol: "https",
-                hostname: "**",
-            },
-        ],
-    },
-    env: {
-        API_URL: process.env.API_URL,
-    },
+    // images: {
+    //     remotePatterns: [
+    //         {
+    //             protocol: "https",
+    //             hostname: "**",
+    //         },
+    //     ],
+    //     unoptimized: true,
+    // },
+    // env: {
+    //     API_URL: process.env.API_URL,
+    // },
     output: 'export',
-    distDir: 'build/client',
-    // Add assetPrefix for static export
-    assetPrefix: process.env.NODE_ENV === 'production' ? './' : '',
-    // Ensure CSS is properly handled
-    webpack: (config) => {
-        config.module.rules.push({
-            test: /\.css$/,
-            use: ['style-loader', 'css-loader'],
-        });
-        return config;
-    },
-    async rewrites() {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        // If no API URL is set, return empty rewrites array
-        if (!apiUrl) {
-            console.warn('NEXT_PUBLIC_API_URL is not set');
-            return [];
-        }
-        // Ensure the API URL ends with a slash
-        const baseUrl = apiUrl.endsWith('/') ? apiUrl : `${apiUrl}/`;
-        return [
-            {
-                source: '/api/:path*',
-                destination: `${baseUrl}:path*`,
-            },
-        ];
-    },
     eslint: {
         // Warning: This allows production builds to successfully complete even if
         // your project has ESLint errors.
         ignoreDuringBuilds: true,
-    },
+    }
 };
 
 module.exports = nextConfig; 

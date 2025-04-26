@@ -36,11 +36,11 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import type { Session } from "@/lib/auth";
+import * as UserAuth from "@/types/auth";
 import { useAuth } from "@/hooks/use-auth";
 
 interface SidebarProps {
-    user: Session | undefined;
+    user: Partial<UserAuth.UserAuthResponse> | null;
     isMobile?: boolean;
 }
 
@@ -217,7 +217,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                         >
                                             <Avatar className="h-10 w-10 border-2 border-primary/10">
                                                 <AvatarFallback className="bg-primary/10 text-primary">
-                                                    {user?.name.charAt(0)}
+                                                    {user?.name?.charAt(0)}
                                                 </AvatarFallback>
                                             </Avatar>
                                             {(!isMobile || isMobile) &&

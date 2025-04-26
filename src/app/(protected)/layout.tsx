@@ -1,5 +1,9 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,21 +13,35 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/sidebar/sidebar";
-import { getSession } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 
-export default async function ProtectedLayout({
-    children,
-}: {
-    children: ReactNode;
-}) {
-    // Get the session
-    const session = await getSession();
+export default function ProtectedLayout({ children }: { children: ReactNode }) {
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && !user) {
+            router.push("/login");
+        }
+    }, [user, isLoading, router]);
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="flex h-screen overflow-hidden bg-background">
             {/* Desktop Sidebar - Hidden on mobile */}
             <div className="hidden md:block">
-                <Sidebar user={session || undefined} />
+                <Sidebar user={user} />
             </div>
 
             <div className="flex flex-1 flex-col overflow-hidden">
@@ -45,10 +63,7 @@ export default async function ProtectedLayout({
                                 <SheetTitle className="sr-only">
                                     Navigation Menu
                                 </SheetTitle>
-                                <Sidebar
-                                    user={session || undefined}
-                                    isMobile={true}
-                                />
+                                <Sidebar user={user} isMobile={true} />
                             </SheetContent>
                         </Sheet>
                         <h1 className="text-xl font-bold">
