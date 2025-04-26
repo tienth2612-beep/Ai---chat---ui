@@ -1,54 +1,56 @@
-import { companyService } from "../service/company.service";
-import * as CompanyModel from "@/types/company";
-import { GetAllCompanyRequest } from "@/types/company";
-import * as UserModel from "@/types/user";
-import { notFound } from "next/navigation";
+import { companyService } from "@/lib/service/company.service";
+import { CompanyResponse, GetAllCompanyRequest } from "@/types/company";
+import { User } from "@/types/user";
 
 export const companyAction = {
-    getCompanyDetail: async (
-        id: number
-    ): Promise<CompanyModel.CompanyResponse> => {
-        try {
-            const request: GetAllCompanyRequest = {
-                page: id,
-                pageSize: 10,
-                fromDate: "",
-                toDate: "",
-                search: "",
-            };
-            const response = await companyService.GetAllCompany(request);
-            if (!response.isSuccess || !response.data) {
-                notFound();
-            }
-            return response.data;
-        } catch (error) {
-            console.error("Get company detail error:", error);
-            notFound();
-        }
+    getCompanyDetail: async (id: number): Promise<CompanyResponse> => {
+        const request: GetAllCompanyRequest = {
+            page: 1,
+            pageSize: 1,
+            fromDate: "",
+            toDate: "",
+            search: id.toString(),
+        };
+        const response = await companyService.GetAllCompany(request);
+        return response.data;
     },
-
-    getEmployeesByCompanyId: async (id: number): Promise<UserModel.User[]> => {
-        try {
-            const response = await companyService.GetAllUser(id, {});
-            if (!response.isSuccess || !response.data) {
-                return [];
-            }
-            // Transform the response to match the User type
-            return [
-                {
-                    id: response.data.id.toString(),
-                    name: response.data.name || "",
-                    email: response.data.email || "",
-                    role: response.data.company?.name || "",
-                    membership: "basic",
-                    status: response.data.status === 1 ? "active" : "inactive",
-                    companyId: id,
-                    createdAt: response.data.createAt,
-                },
-            ];
-        } catch (error) {
-            console.error("Get employees by company ID error:", error);
-            return [];
-        }
+    getEmployeesByCompanyId: async (id: number): Promise<User[]> => {
+        const response = await companyService.GetAllUser(id, {});
+        const userResponse = response.data;
+        const users: User[] = Array.isArray(userResponse)
+            ? userResponse.map((user) => ({
+                  id: user.id.toString(),
+                  name: user.name || "",
+                  email: user.email || "",
+                  role: user.company?.name || "",
+                  membership: "basic",
+                  status: user.status === 1 ? "active" : "inactive",
+                  companyId: id,
+                  createdAt: user.createAt,
+              }))
+            : [
+                  {
+                      id: userResponse.id.toString(),
+                      name: userResponse.name || "",
+                      email: userResponse.email || "",
+                      role: userResponse.company?.name || "",
+                      membership: "basic",
+                      status: userResponse.status === 1 ? "active" : "inactive",
+                      companyId: id,
+                      createdAt: userResponse.createAt,
+                  },
+              ];
+        return users;
+    },
+    getAllCompanies: async (): Promise<CompanyResponse[]> => {
+        const request: GetAllCompanyRequest = {
+            page: 1,
+            pageSize: 100,
+            fromDate: "",
+            toDate: "",
+            search: null,
+        };
+        const response = await companyService.GetAllCompany(request);
+        return Array.isArray(response.data) ? response.data : [response.data];
     },
 };

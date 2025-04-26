@@ -3,16 +3,17 @@ import { BaseResultWithData } from "@/types/api";
 import * as CompanyModel from "@/types/company";
 import * as UserModel from "@/types/user";
 import { API_URL } from "../constants";
+import { AxiosError } from "axios";
 
 export const companyService = {
     GetAllCompany: async (
-        data: Partial<CompanyModel.GetAllCompanyRequest>
+        data?: Partial<CompanyModel.GetAllCompanyRequest>
     ): Promise<BaseResultWithData<CompanyModel.CompanyResponse>> => {
         try {
             return api.post(API_URL.COMPANY, { params: data });
-        } catch (error: any) {
-            if (error) {
-                return error;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                return error.response?.data || error;
             }
             throw error;
         }
@@ -26,9 +27,9 @@ export const companyService = {
             return api.post(`${API_URL.COMPANY}/${id}`, {
                 params: data,
             });
-        } catch (error: any) {
-            if (error) {
-                return error;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                return error.response?.data || error;
             }
             throw error;
         }
