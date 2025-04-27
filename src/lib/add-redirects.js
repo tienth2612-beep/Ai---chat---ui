@@ -10,4 +10,9 @@ const redirectsPath = path.join(__dirname, '..', '..', 'out', '_redirects');
 // Ghi file vào thư mục /out
 fs.outputFileSync(redirectsPath, redirectsContent);
 
-console.log('✅ _redirects file created at', redirectsPath);
+console.log('✅ _redirects file created at', redirectsPath).then(() => {
+    console.log('Successfully created _redirects at: ', redirectsPath);
+})
+    .catch((err) => {
+        console.error('Failed to create _redirects', err);
+    });;
