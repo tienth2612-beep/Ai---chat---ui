@@ -1,18 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // images: {
-    //     remotePatterns: [
-    //         {
-    //             protocol: "https",
-    //             hostname: "**",
-    //         },
-    //     ],
-    //     unoptimized: true,
-    // },
-    // env: {
-    //     API_URL: process.env.API_URL,
-    // },
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "**",
+            },
+        ],
+        unoptimized: true,
+    },
+    env: {
+        API_URL: process.env.API_URL,
+    },
     output: 'export',
+    // Add assetPrefix for static export
+    assetPrefix: process.env.NODE_ENV === 'production' ? './' : '',
+    // Ensure CSS is properly handled
+    webpack: (config) => {
+        config.module.rules.push({
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader'],
+        });
+        return config;
+    },
+    distDir: 'build/client',
     eslint: {
         // Warning: This allows production builds to successfully complete even if
         // your project has ESLint errors.
