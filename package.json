@@ -12,7 +12,8 @@
         "start": "next start -p $PORT",
         "lint": "next lint",
         "heroku-postbuild": "npm run build",
-        "heroku-prebuild": "npm install"
+        "heroku-prebuild": "npm install",
+        "postexport": "node src/lib/add-redirects.js"
     },
     "dependencies": {
         "@hookform/resolvers": "^5.0.1",
@@ -53,6 +54,7 @@
         "css-loader": "^6.11.0",
         "eslint": "^8.56.0",
         "eslint-config-next": "14.1.0",
+        "fs-extra": "^11.3.0",
         "style-loader": "^3.3.4",
         "tailwindcss": "^4",
         "tailwindcss-animate": "^1.0.7",
