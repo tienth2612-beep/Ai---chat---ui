@@ -24,18 +24,18 @@ export interface Company {
 }
 
 export interface CompanyResponse {
-    Id: number;
-    Name?: string;
-    Description?: string;
-    Logo?: string;
-    Phone?: string;
-    Email?: string;
-    Website?: string;
-    Street1?: string;
-    Street2?: string;
-    City?: string;
-    State?: string;
-    ZipCode?: string;
+    id: number;
+    name?: string;
+    description?: string;
+    logo?: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+    street1?: string;
+    street2?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
 }
 
 export interface DetailCompanyResponse {

@@ -9,6 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 
+const DateRangeModel: DateRange = {
+    from: new Date(new Date().setDate(new Date().getDate() - 30)),
+    to: new Date(),
+};
+
 interface DataTableSearchProps {
     placeholder?: string;
     onSearch: (params: {
@@ -23,7 +28,7 @@ export function DataTableSearch({
     placeholder = "Search...",
     onSearch,
     initialSearchTerm = "",
-    initialDateRange,
+    initialDateRange = DateRangeModel,
 }: DataTableSearchProps) {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [dateRange, setDateRange] = useState<DateRange | undefined>(

@@ -12,7 +12,7 @@ const nextConfig = {
     // env: {
     //     API_URL: process.env.API_URL,
     // },
-    output: 'export',
+    //output: 'export',
     //distDir: 'build/client',
     eslint: {
         // Warning: This allows production builds to successfully complete even if

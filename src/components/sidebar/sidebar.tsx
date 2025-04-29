@@ -286,7 +286,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                         <DropdownMenuItem
                                             onClick={() =>
                                                 handleNavigation(
-                                                    "/change-password"
+                                                    "/account/change-password"
                                                 )
                                             }
                                         >

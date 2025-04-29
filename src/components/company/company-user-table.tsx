@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import type React from "react";
+
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 import {
@@ -11,97 +13,98 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { toast } from "sonner";
-import type { DateRange } from "react-day-picker";
-import { format } from "date-fns";
-import { DataTablePagination } from "../ui/data-table-pagination";
-import { DataTableSearch } from "../data-table-search";
-import { useUsers } from "@/hooks/use-users";
+import { useCompany } from "@/hooks/use-company";
+import * as UserModel from "@/types/user";
+interface CompanyUserTableProps {
+    companyId: string;
+}
 
-export function UserTable() {
-    const { users, totalUsers, isLoading, getUsers, formatDateRange } =
-        useUsers();
-
-    // Search and filter state
-    const [currentSearchTerm, setCurrentSearchTerm] = useState("");
-    const [currentDateRange, setCurrentDateRange] = useState<
-        DateRange | undefined
-    >(undefined);
-
-    // Pagination state
+export function CompanyUserTable({ companyId }: CompanyUserTableProps) {
+    const { users, totalUsers, getUserByCompanyId, isLoading } = useCompany();
+    const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
 
     // Calculate total pages
     const totalPages = Math.ceil(totalUsers / itemsPerPage);
 
-    // Function to fetch users with current filters
-    const fetchUsers = async (params: {
-        searchTerm?: string;
-        dateRange?: DateRange;
-        page?: number;
-        limit?: number;
-    }) => {
-        const {
-            searchTerm = currentSearchTerm,
-            dateRange = currentDateRange,
-            page = currentPage,
-            limit = itemsPerPage,
-        } = params;
-        // Format date range for API
-        const { startDate, endDate } = formatDateRange(dateRange);
+    // Load initial data
+    useEffect(() => {
+        fetchUsers();
+    }, [companyId]);
+
+    // Function to fetch users
+    const fetchUsers = async (
+        search: string = searchTerm,
+        page: number = currentPage,
+        limit: number = itemsPerPage
+    ) => {
+        const filters: Partial<UserModel.GetAllUsersRequest> = {
+            search,
+            page,
+            pageSize: limit,
+        };
         try {
-            await getUsers({
-                search: searchTerm,
-                fromDate: startDate,
-                toDate: endDate,
-                page,
-                pageSize: limit,
-            });
-            // Update current state
-            setCurrentSearchTerm(searchTerm);
-            setCurrentDateRange(dateRange);
+            await getUserByCompanyId(companyId, filters);
+            setSearchTerm(searchTerm);
         } catch (error) {
-            console.error("Error fetching users:", error);
-            toast("Error", {
-                description: "Failed to fetch users",
-            });
+            console.error("Error fetching company users:", error);
+            toast.error("Failed to fetch company users");
         }
     };
 
-    const handleSearch = ({
-        searchTerm,
-        dateRange,
-    }: {
-        searchTerm: string;
-        dateRange: DateRange | undefined;
-    }) => {
+    // Handle search
+    const handleSearch = () => {
         setCurrentPage(1); // Reset to first page when search changes
-        fetchUsers({ searchTerm, dateRange, page: 1 });
+        fetchUsers(searchTerm, 1, itemsPerPage);
     };
 
+    // Handle search input change
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+    };
+
+    // Handle search on Enter key
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
+
+    // Handle page change
     const handlePageChange = (page: number) => {
         if (page < 1 || page > totalPages) return;
         setCurrentPage(page);
-        fetchUsers({ page });
+        fetchUsers(searchTerm, page, itemsPerPage);
     };
 
+    // Handle items per page change
     const handleItemsPerPageChange = (value: string) => {
         const newItemsPerPage = Number.parseInt(value);
         setItemsPerPage(newItemsPerPage);
         setCurrentPage(1); // Reset to first page when items per page changes
-        fetchUsers({ page: 1, limit: newItemsPerPage });
+        fetchUsers(searchTerm, 1, newItemsPerPage);
     };
 
     return (
         <div className="space-y-4">
-            <DataTableSearch
-                placeholder="Search users..."
-                onSearch={handleSearch}
-                initialSearchTerm={currentSearchTerm}
-                initialDateRange={currentDateRange}
-            />
+            <div className="flex items-center space-x-2">
+                <div className="relative flex-1 max-w-sm">
+                    <Input
+                        placeholder="Search users..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        onKeyDown={handleKeyDown}
+                        className="pr-10"
+                    />
+                </div>
+                <Button onClick={handleSearch}>Search</Button>
+            </div>
 
             <div className="rounded-md border">
                 <Table>
@@ -121,7 +124,7 @@ export function UserTable() {
                         {isLoading ? (
                             <TableRow>
                                 <TableCell
-                                    colSpan={7}
+                                    colSpan={6}
                                     className="h-24 text-center"
                                 >
                                     <div className="flex items-center justify-center">
@@ -135,10 +138,10 @@ export function UserTable() {
                         ) : users.length === 0 ? (
                             <TableRow>
                                 <TableCell
-                                    colSpan={7}
+                                    colSpan={6}
                                     className="h-24 text-center"
                                 >
-                                    No users found matching your criteria.
+                                    No users found in this company.
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -161,12 +164,6 @@ export function UserTable() {
                                                 ? "Active"
                                                 : "Inactive"}
                                         </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        {format(
-                                            new Date(user.createAt),
-                                            "MMM d, yyyy"
-                                        )}
                                     </TableCell>
                                     {/* <TableCell className="text-right">
                                         <DropdownMenu>
@@ -191,19 +188,8 @@ export function UserTable() {
                                                         href={`/users/${user.id}`}
                                                     >
                                                         <Edit className="mr-2 h-4 w-4" />
-                                                        Edit
+                                                        View User
                                                     </Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    className="text-red-600"
-                                                    onClick={() =>
-                                                        handleDeleteUser(
-                                                            user.id
-                                                        )
-                                                    }
-                                                >
-                                                    <Trash className="mr-2 h-4 w-4" />
-                                                    Delete
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
