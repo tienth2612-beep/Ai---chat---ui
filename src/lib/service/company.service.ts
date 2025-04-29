@@ -1,5 +1,5 @@
 import api from "../axios";
-import { BaseResult, BaseResultWithData, PageResult } from "@/types/api";
+import { BaseResultWithData, PageResult } from "@/types/api";
 import * as CompanyModel from "@/types/company";
 import * as UserModel from "@/types/user";
 import { API_URL } from "../constants";

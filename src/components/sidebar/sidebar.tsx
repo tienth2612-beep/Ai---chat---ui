@@ -149,7 +149,10 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                     <div className="sidebar-scrollbar flex-1 overflow-y-auto py-6">
                         <nav className="space-y-1 px-3">
                             {navItems.map((item) => {
-                                const isActive = pathname === item.href;
+                                const isActive =
+                                    pathname === item.href ||
+                                    (item.href !== "/" &&
+                                        pathname.startsWith(item.href));
                                 return (
                                     <Tooltip key={item.href}>
                                         <TooltipTrigger asChild>

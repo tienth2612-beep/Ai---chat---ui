@@ -18,9 +18,7 @@ export function useUsers() {
         async (filters: Partial<UserModel.GetAllUsersRequest> = {}) => {
             setIsLoading(true);
             setError(null);
-            console.log("Request get user", filters);
             try {
-                console.log("Request get user", filters);
                 const response = await userService.GetAllUser(filters);
 
                 if (response.items && response) {

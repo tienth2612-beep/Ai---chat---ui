@@ -47,10 +47,6 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
         fetchCompany();
     }, [companyId, getCompanyById]);
 
-    const handleEdit = () => {
-        router.push(`/companies/${companyId}/edit`);
-    };
-
     const handleBack = () => {
         router.push("/companies");
     };
@@ -172,9 +168,8 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                                         Address
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        {company.street1 +
-                                            " " +
-                                            company.street2}
+                                        {company.street1 ?? ""}
+                                        {company.street2 ?? ""}
                                     </p>
                                 </div>
                             </div>

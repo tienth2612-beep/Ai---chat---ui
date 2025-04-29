@@ -193,7 +193,7 @@ export function CompanyTable() {
                                                         href={`/companies/${company.id}`}
                                                     >
                                                         <View className="mr-2 h-4 w-4" />
-                                                        View employees
+                                                        View details
                                                     </Link>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>

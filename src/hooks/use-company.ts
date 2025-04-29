@@ -23,9 +23,7 @@ export function useCompany() {
         async (filters: Partial<CompanyModel.GetAllCompanyRequest> = {}) => {
             setIsLoading(true);
             setError(null);
-            console.log("Request get user", filters);
             try {
-                console.log("Request get user", filters);
                 const response = await companyService.GetAllCompany(filters);
 
                 if (response.items && response) {
