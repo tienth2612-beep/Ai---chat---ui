@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Mail, Phone, Globe, MapPin } from "lucide-react";
+import {
+    Loader2,
+    Mail,
+    Phone,
+    Globe,
+    MapPin,
+    Building2,
+    Users,
+} from "lucide-react";
 
 import {
     Card,
@@ -101,37 +109,29 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                 <CardContent className="space-y-6">
                     <div className="grid gap-6 md:grid-cols-2">
                         <div className="space-y-4">
-                            {/* <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-3">
                                 <Building2 className="h-5 w-5 text-muted-foreground" />
                                 <div>
                                     <p className="text-sm font-medium">
                                         Industry
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        {company.industry}
+                                        {company.industries}
                                     </p>
                                 </div>
-                            </div> */}
-                            {/* <div className="flex items-center space-x-3">
+                            </div>
+                            <div className="flex items-center space-x-3">
                                 <Users className="h-5 w-5 text-muted-foreground" />
                                 <div>
                                     <p className="text-sm font-medium">
                                         Company Size
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        {company.size}
-                                    </p>
-                                </div>
-                            </div> */}
-                            <div className="flex items-center space-x-3">
-                                <Mail className="h-5 w-5 text-muted-foreground" />
-                                <div>
-                                    <p className="text-sm font-medium">Email</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {company.email}
+                                        {company.totalMember}
                                     </p>
                                 </div>
                             </div>
+
                             <div className="flex items-center space-x-3">
                                 <Phone className="h-5 w-5 text-muted-foreground" />
                                 <div>
@@ -143,6 +143,15 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                             </div>
                         </div>
                         <div className="space-y-4">
+                            <div className="flex items-center space-x-3">
+                                <Mail className="h-5 w-5 text-muted-foreground" />
+                                <div>
+                                    <p className="text-sm font-medium">Email</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {company.email}
+                                    </p>
+                                </div>
+                            </div>
                             <div className="flex items-center space-x-3">
                                 <Globe className="h-5 w-5 text-muted-foreground" />
                                 <div>

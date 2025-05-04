@@ -10,6 +10,14 @@ export interface ApiError {
     errors?: Record<string, string[]>;
 }
 
+export interface FilterRequest {
+    page: number;
+    pageSize: number;
+    search?: string;
+    fromDate?: string;
+    toDate?: string;
+}
+
 export interface BaseResultWithData<T> {
     isSuccess: boolean;
     code: number;

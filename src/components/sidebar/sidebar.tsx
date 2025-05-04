@@ -27,6 +27,8 @@ import {
     ChevronLeft,
     Building2,
     Key,
+    ShieldCheck,
+    Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -66,16 +68,23 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
             href: "/dashboard",
             icon: LayoutDashboard,
         },
-        // {
-        //     title: "Projects",
-        //     href: "/dashboard/projects",
-        //     icon: FolderKanban,
-        // },
-        // {
-        //     title: "Analytics",
-        //     href: "/dashboard/analytics",
-        //     icon: BarChart,
-        // },
+        {
+            title: "RBAC",
+            href: "/rbac",
+            icon: ShieldCheck,
+            submenu: [
+                {
+                    title: "Roles",
+                    href: "/rbac/roles",
+                    icon: ShieldCheck,
+                },
+                {
+                    title: "Permissions",
+                    href: "/rbac/permissions",
+                    icon: Lock,
+                },
+            ],
+        },
         {
             title: "Companies",
             href: "/companies",
@@ -85,6 +94,11 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
             title: "Users",
             href: "/users",
             icon: Users,
+        },
+        {
+            title: "Memberships",
+            href: "/memberships",
+            icon: CreditCard,
         },
         {
             title: "Settings",
@@ -153,6 +167,87 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                     pathname === item.href ||
                                     (item.href !== "/" &&
                                         pathname.startsWith(item.href));
+                                // Render submenu items if they exist
+                                if (item.submenu && !collapsed) {
+                                    return (
+                                        <div
+                                            key={item.href}
+                                            className="space-y-1"
+                                        >
+                                            <button
+                                                onClick={() =>
+                                                    handleNavigation(item.href)
+                                                }
+                                                className={cn(
+                                                    "group relative flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                                                    isActive
+                                                        ? "bg-primary/10 text-primary"
+                                                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                )}
+                                            >
+                                                <item.icon
+                                                    className={cn(
+                                                        "h-5 w-5 shrink-0 transition-all mr-3",
+                                                        isActive
+                                                            ? "text-primary"
+                                                            : "text-muted-foreground group-hover:text-foreground"
+                                                    )}
+                                                />
+                                                <span className="truncate">
+                                                    {item.title}
+                                                </span>
+                                                {isActive && (
+                                                    <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-md" />
+                                                )}
+                                            </button>
+
+                                            {/* Submenu items */}
+                                            <div className="pl-8 space-y-1">
+                                                {item.submenu.map((subItem) => {
+                                                    const isSubActive =
+                                                        pathname ===
+                                                            subItem.href ||
+                                                        pathname.startsWith(
+                                                            subItem.href + "/"
+                                                        );
+                                                    return (
+                                                        <button
+                                                            key={subItem.href}
+                                                            onClick={() =>
+                                                                handleNavigation(
+                                                                    subItem.href
+                                                                )
+                                                            }
+                                                            className={cn(
+                                                                "group relative flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
+                                                                isSubActive
+                                                                    ? "bg-primary/10 text-primary"
+                                                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                            )}
+                                                        >
+                                                            {subItem.icon && (
+                                                                <subItem.icon
+                                                                    className={cn(
+                                                                        "h-4 w-4 shrink-0 transition-all mr-3",
+                                                                        isSubActive
+                                                                            ? "text-primary"
+                                                                            : "text-muted-foreground group-hover:text-foreground"
+                                                                    )}
+                                                                />
+                                                            )}
+                                                            <span className="truncate">
+                                                                {subItem.title}
+                                                            </span>
+                                                            {isSubActive && (
+                                                                <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-md" />
+                                                            )}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                }
                                 return (
                                     <Tooltip key={item.href}>
                                         <TooltipTrigger asChild>

@@ -1,11 +1,8 @@
+import { FilterRequest } from "./api";
+
 //#region "Request"
-export interface GetAllUsersRequest {
-    fromDate: string;
-    toDate: string;
-    page: number;
-    pageSize: number;
-    search: string | null;
-}
+export interface GetAllUsersRequest extends FilterRequest {}
+
 export interface GetUserRequest {
     userId: number;
 }

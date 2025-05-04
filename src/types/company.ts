@@ -1,11 +1,7 @@
+import { FilterRequest } from "./api";
+
 //#region "Request"
-export interface GetAllCompanyRequest {
-    fromDate: string;
-    toDate: string;
-    page: number;
-    pageSize: number;
-    search: string | null;
-}
+export interface GetAllCompanyRequest extends FilterRequest {}
 
 export interface GetCompanyRequest {
     userId: number;
@@ -62,5 +58,7 @@ export interface DetailCompanyResponse {
     timeFormat: string | null;
     firstDayOfWeek: number;
     status: number;
+    industries: string | null;
+    totalMember: string | null;
 }
 //#endregion

@@ -11,8 +11,18 @@ export const API_URL = {
 
     //USer
     USER: "user",
+
     //company
     COMPANY: "Company",
+
+    //membership
+    MEMBERSHIP: "package",
+    SUBSCRIPTION_HISTORY: "package/subscription-history",
+
+    //rbac
+    PERMISSIONS: "rbac/permission",
+    ROLES: "rbac/role",
+    PACKAGE_ROLES: "rbac/package",
 
     //common
     COUNTRIES: "Common/countries",
