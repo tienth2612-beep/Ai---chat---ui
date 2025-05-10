@@ -55,6 +55,7 @@ export function useMemberships() {
             const response = await membershipService.getMembershipById(id);
 
             if (response.isSuccess && response.data) {
+                console.log(response.data);
                 setMembership(response.data);
             } else {
                 setError(response.message || "Failed to fetch membership");

@@ -115,6 +115,11 @@ export function MembershipForm({
             router.push(`/memberships/${membership.id}/permissions`);
         }
     };
+    const handleManageRoles = () => {
+        if (membership) {
+            router.push(`/memberships/${membership.id}/roles`);
+        }
+    };
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -173,15 +178,6 @@ export function MembershipForm({
                             ? "Update Membership"
                             : "Create Membership"}
                     </Button>
-                    {isEditing && membership && (
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleManagePermissions}
-                        >
-                            Manage Permissions
-                        </Button>
-                    )}
                     <Button
                         type="button"
                         variant="outline"

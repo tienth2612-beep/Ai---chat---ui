@@ -166,7 +166,6 @@ export function useRbac() {
             setError(null);
             try {
                 const response = await rbacService.getListRoles(filters);
-
                 if (response.items && response) {
                     setRoles(response.items);
                     setTotalRoles(response.totalCount);
@@ -251,7 +250,7 @@ export function useRbac() {
                     packageId,
                     filters
                 );
-
+                console.log(response);
                 if (response.items && response) {
                     setRolesOfPackage(response.items);
                     setTotalRolesOfPackage(response.totalCount);
@@ -426,7 +425,7 @@ export function useRbac() {
     const getAssignOfPackage = useCallback(
         async (
             packageId: number,
-            filters: Partial<RbacModel.GetAssignRequest>
+            filters: Partial<RbacModel.GetAssignRequest> = {}
         ) => {
             setIsLoading(true);
             setError(null);

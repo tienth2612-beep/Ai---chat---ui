@@ -56,23 +56,6 @@ export function RoleDetail({ id }: RoleDetailProps) {
     const handleAddPermissions = () => {
         router.push(`/rbac/roles/${id}/add-permissions`);
     };
-    const handleRemovePermission = async (permissionId: number) => {
-        if (!role) return;
-
-        try {
-            const success = await updateRoleAssignment({
-                id: role.id,
-                active: false,
-            });
-            if (success) {
-                await getRoleAssignments(Number(id), {});
-
-                toast.success(`Permission has been deactivated successfully.`);
-            }
-        } catch (error) {
-            toast.error("Failed to remove permission. Please try again.");
-        }
-    };
     const handleTogglePermission = async (
         permissionId: number,
         active: boolean
@@ -81,7 +64,7 @@ export function RoleDetail({ id }: RoleDetailProps) {
 
         try {
             const success = await updateRoleAssignment({
-                id: role.id,
+                id: permissionId,
                 active: active,
             });
             if (success) {

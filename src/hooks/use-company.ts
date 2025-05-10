@@ -6,7 +6,9 @@ import * as UserModel from "@/types/user";
 import type { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { companyService } from "@/lib/service/company.service";
-
+import * as JobModel from "@/types/job";
+import * as QuoteModel from "@/types/quote";
+import * as InvoiceModel from "@/types/invoice";
 // Hook
 export function useCompany() {
     const [companies, setCompanies] = useState<CompanyModel.CompanyResponse[]>(
@@ -17,6 +19,22 @@ export function useCompany() {
     const [totalCompanies, setTotalCompanies] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [companyActiveWork, setCompanyActiveWork] = useState<
+        CompanyModel.CompanyActiveWorkResponse[]
+    >([]);
+    const [totalCompanyActiveWork, setTotalCompanyActiveWork] = useState(0);
+    const [companyMetrics, setCompanyMetrics] =
+        useState<CompanyModel.CompanyMetricsResponse>();
+    const [companyJobs, setCompanyJobs] = useState<JobModel.JobResponse[]>([]);
+    const [totalCompanyJobs, setTotalCompanyJobs] = useState(0);
+    const [companyQuotes, setCompanyQuotes] = useState<
+        QuoteModel.QuotesResponse[]
+    >([]);
+    const [totalCompanyQuotes, setTotalCompanyQuotes] = useState(0);
+    const [companyInvoices, setCompanyInvoices] = useState<
+        InvoiceModel.InvoicesResponse[]
+    >([]);
+    const [totalCompanyInvoices, setTotalCompanyInvoices] = useState(0);
 
     // Get users with filters
     const getCompanies = useCallback(
@@ -178,6 +196,145 @@ export function useCompany() {
     //     }
     // }, []);
 
+    const getCompanyActiveWork = useCallback(async (id: string) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await companyService.GetCompanyActiveWork(
+                Number.parseInt(id)
+            );
+
+            if (response && response.items) {
+                setCompanyActiveWork(response.items);
+                setTotalCompanyActiveWork(response.totalCount);
+                return response.items;
+            } else {
+                setError("Failed to fetch company active work");
+                return null;
+            }
+        } catch (error) {
+            console.error("Get company active work error:", error);
+            setError("An unexpected error occurred. Please try again.");
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const getCompanyMetrics = useCallback(async (id: string) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await companyService.GetCompanyMetrics(
+                Number.parseInt(id)
+            );
+
+            if (response && response.isSuccess) {
+                setCompanyMetrics(response.data);
+                return response.data;
+            } else {
+                setError("Failed to fetch company metrics");
+                return null;
+            }
+        } catch (error) {
+            console.error("Get company metrics error:", error);
+            setError("An unexpected error occurred. Please try again.");
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const getCompanyJobs = useCallback(
+        async (id: string, filters: Partial<JobModel.GetJobsRequest>) => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const response = await companyService.GetCompanyJobs(
+                    Number.parseInt(id),
+                    filters
+                );
+
+                if (response && response.items) {
+                    setCompanyJobs(response.items);
+                    setTotalCompanyJobs(response.totalCount);
+                    return response.items;
+                } else {
+                    setError("Failed to fetch company jobs");
+                    return null;
+                }
+            } catch (error) {
+                console.error("Get company jobs error:", error);
+                setError("An unexpected error occurred. Please try again.");
+                return null;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        []
+    );
+
+    const getCompanyQuotes = useCallback(
+        async (id: string, filters: Partial<QuoteModel.GetQuotesRequest>) => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const response = await companyService.GetCompanyQuotes(
+                    Number.parseInt(id),
+                    filters
+                );
+
+                if (response && response.items) {
+                    setCompanyQuotes(response.items);
+                    setTotalCompanyQuotes(response.totalCount);
+                    return response.items;
+                } else {
+                    setError("Failed to fetch company quotes");
+                    return null;
+                }
+            } catch (error) {
+                console.error("Get company quotes error:", error);
+                setError("An unexpected error occurred. Please try again.");
+                return null;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        []
+    );
+
+    const getCompanyInvoices = useCallback(
+        async (
+            id: string,
+            filters: Partial<InvoiceModel.GetInvoicesRequest>
+        ) => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const response = await companyService.GetCompanyInvoices(
+                    Number.parseInt(id),
+                    filters
+                );
+
+                if (response && response.items) {
+                    setCompanyInvoices(response.items);
+                    setTotalCompanyInvoices(response.totalCount);
+                    return response.items;
+                } else {
+                    setError("Failed to fetch company invoices");
+                    return null;
+                }
+            } catch (error) {
+                console.error("Get company invoices error:", error);
+                setError("An unexpected error occurred. Please try again.");
+                return null;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        []
+    );
+
     // Helper function to format date range for API
     const formatDateRange = (dateRange: DateRange | undefined) => {
         if (!dateRange) return { startDate: undefined, endDate: undefined };
@@ -199,9 +356,23 @@ export function useCompany() {
         totalUsers,
         isLoading,
         error,
+        companyActiveWork,
+        companyMetrics,
+        companyJobs,
+        totalCompanyJobs,
+        companyQuotes,
+        totalCompanyQuotes,
+        companyInvoices,
+        totalCompanyInvoices,
+        totalCompanyActiveWork,
         getCompanies,
         getUserByCompanyId,
         formatDateRange,
         getCompanyById,
+        getCompanyActiveWork,
+        getCompanyMetrics,
+        getCompanyJobs,
+        getCompanyQuotes,
+        getCompanyInvoices,
     };
 }

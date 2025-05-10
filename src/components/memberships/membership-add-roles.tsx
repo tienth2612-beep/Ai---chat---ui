@@ -16,32 +16,35 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { ArrowLeft, Search } from "lucide-react";
-import * as rbacModel from "@/types/rbac";
+
+import * as MembershipModel from "@/types/membership";
+import * as RoleModel from "@/types/rbac";
 import { DataTablePagination } from "../ui/data-table-pagination";
 
-interface RoleAddPermissionsProps {
-    roleId: string;
+interface MembershipAddRolesProps {
+    membershipId: string;
+    membership: MembershipModel.PackageResponse;
+    onAddRoles: (membershipId: string, roles: number[]) => Promise<true | null>;
 }
 
-export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
+export function MembershipAddRoles({
+    membershipId,
+    membership,
+    onAddRoles,
+}: MembershipAddRolesProps) {
     const router = useRouter();
     const {
-        getRole,
-        createRoleAssignment,
-        getPermissions,
-        getRoleAssignments,
-        isLoading,
-        permissions,
-        permissionsOfRole,
-        role,
-        isLoading: roleLoading,
+        getRoles,
+        getPackageRoles,
+        isLoading: rolesLoading,
+        roles,
+        rolesOfPackage,
     } = useRbac();
-    const [filteredPermissions, setFilteredPermissions] = useState<
-        rbacModel.PermissionResponse[]
+    const [allRoles, setAllRoles] = useState<RoleModel.RoleResponse[]>([]);
+    const [filteredRoles, setFilteredRoles] = useState<
+        RoleModel.RoleResponse[]
     >([]);
-    const [selectedPermissions, setSelectedPermissions] = useState<number[]>(
-        []
-    );
+    const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -49,106 +52,87 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
     useEffect(() => {
-        const fetchData = async () => {
-            await Promise.all([getRole(Number(roleId)), getPermissions()]);
-
-            if (permissions) {
-                // Filter out permissions that are already assigned to the role
-                const permissionsOfRoleIds = permissionsOfRole.map((p) => p.id);
-                const availablePermissions = permissions.filter(
-                    (p) => !permissionsOfRoleIds.includes(p.id)
-                );
-                setFilteredPermissions(availablePermissions);
-                setTotalPages(
-                    Math.ceil(availablePermissions.length / itemsPerPage)
-                );
-            }
+        const fetchRoles = async () => {
+            await getRoles();
+            await getPackageRoles(membership.id);
         };
 
-        fetchData();
-    }, [roleId, getRole, getPermissions]);
+        fetchRoles();
+    }, [membership, getRoles, getPackageRoles]);
 
     useEffect(() => {
-        // Filter permissions based on search query
-        const filtered = permissions.filter(
-            (p) =>
-                p.permission
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase()) ||
-                p.description.toLowerCase().includes(searchQuery.toLowerCase())
+        if (roles && rolesOfPackage) {
+            const rolesOfPackageIds = rolesOfPackage.map((r) => r.id);
+            const availableRoles = roles.filter(
+                (r) => !rolesOfPackageIds.includes(r.id)
+            );
+            setAllRoles(availableRoles);
+            setFilteredRoles(availableRoles);
+            setTotalPages(Math.ceil(availableRoles.length / itemsPerPage));
+        }
+    }, [roles, rolesOfPackage]);
+
+    useEffect(() => {
+        // Filter roles based on search query
+        const filtered = allRoles.filter(
+            (r) =>
+                r.roleName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                r.description.toLowerCase().includes(searchQuery.toLowerCase())
         );
-        setFilteredPermissions(filtered);
+        setFilteredRoles(filtered);
         setTotalPages(Math.ceil(filtered.length / itemsPerPage));
         setCurrentPage(1); // Reset to first page on new search
-    }, [searchQuery, permissions]);
+    }, [searchQuery, allRoles]);
 
-    const handlePermissionChange = (permissionId: number, checked: boolean) => {
+    const handleRoleChange = (roleId: number, checked: boolean) => {
         if (checked) {
-            setSelectedPermissions((prev) => [...prev, permissionId]);
+            setSelectedRoles((prev) => [...prev, roleId]);
         } else {
-            setSelectedPermissions((prev) =>
-                prev.filter((id) => id !== permissionId)
-            );
+            setSelectedRoles((prev) => prev.filter((id) => id !== roleId));
         }
     };
 
     const handleSave = async () => {
-        if (!role || selectedPermissions.length === 0) return;
+        if (!membership || selectedRoles.length === 0) return;
 
         setIsSaving(true);
         try {
-            // Get the permission codes from the selected IDs
-            const permissionCodes = selectedPermissions
-                .map(
-                    (id) =>
-                        permissions.find((p) => p.id === id)?.permission || ""
-                )
-                .filter((code) => code !== "");
+            // Get the role names from the selected IDs
+            const roleIds = selectedRoles
+                .map((id) => allRoles.find((r) => r.id === id)?.id || 0)
+                .filter((id) => id !== 0);
 
-            const success = await createRoleAssignment({
-                objectId: Number(roleId),
-                permissions: selectedPermissions.map((id) => ({
-                    permissionId: id,
-                })),
-            });
+            const success = await onAddRoles(membershipId, roleIds);
 
             if (success) {
                 toast.success(
-                    `${selectedPermissions.length} permissions have been added to this role.`
+                    `${selectedRoles.length} roles have been added to this membership.`
                 );
-                router.push(`/rbac/roles/${roleId}`);
+                router.push(`/memberships/${membershipId}`);
             }
         } catch (error) {
             toast.error(
-                "An error occurred while adding permissions. Please try again."
+                "An error occurred while adding roles. Please try again."
             );
         } finally {
             setIsSaving(false);
         }
     };
 
-    const handlePageChange = (page: number) => {
-        if (page < 1 || page > totalPages) return;
-        setCurrentPage(page);
-        getPermissions({ page });
-    };
-
-    const handleItemsPerPageChange = (value: string) => {
-        const newItemsPerPage = Number.parseInt(value);
-        setItemsPerPage(newItemsPerPage);
-        setCurrentPage(1); // Reset to first page when items per page changes
-        getPermissions({ page: 1, pageSize: newItemsPerPage });
-    };
-
     // Get current items for pagination
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredPermissions.slice(
-        indexOfFirstItem,
-        indexOfLastItem
-    );
+    const currentItems = filteredRoles.slice(indexOfFirstItem, indexOfLastItem);
 
-    if (roleLoading || isLoading) {
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const handleItemsPerPageChange = (value: string) => {
+        setItemsPerPage(parseInt(value));
+    };
+
+    if (rolesLoading) {
         return (
             <div className="space-y-4">
                 <Skeleton className="h-10 w-[150px]" />
@@ -157,8 +141,8 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
         );
     }
 
-    if (!role) {
-        return <div>Role not found</div>;
+    if (!membership) {
+        return <div>Membership not found</div>;
     }
 
     return (
@@ -167,17 +151,19 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() => router.push(`/memberships/${membershipId}`)}
                 >
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Role
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Membership
                 </Button>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Add Permissions to {role.roleName}</CardTitle>
+                    <CardTitle>Add Roles to {membership.name}</CardTitle>
                     <CardDescription>
-                        Select the permissions you want to add to this role.
+                        Select the roles you want to add to this membership.
+                        Users with this membership will have all permissions
+                        from these roles.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -185,7 +171,7 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
                         <div className="relative">
                             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search permissions..."
+                                placeholder="Search roles..."
                                 className="pl-8"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -194,32 +180,32 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
 
                         {currentItems.length > 0 ? (
                             <div className="space-y-4">
-                                {currentItems.map((permission) => (
+                                {currentItems.map((role) => (
                                     <div
-                                        key={permission.id}
+                                        key={role.id}
                                         className="flex items-start space-x-3 p-2 hover:bg-muted rounded-md"
                                     >
                                         <Checkbox
-                                            id={`permission-${permission.id}`}
-                                            checked={selectedPermissions.includes(
-                                                permission.id
+                                            id={`membership-role-${role.id}`}
+                                            checked={selectedRoles.includes(
+                                                role.id
                                             )}
                                             onCheckedChange={(checked) =>
-                                                handlePermissionChange(
-                                                    permission.id,
+                                                handleRoleChange(
+                                                    role.id,
                                                     checked as boolean
                                                 )
                                             }
                                         />
                                         <div className="space-y-1 leading-none">
                                             <label
-                                                htmlFor={`permission-${permission.id}`}
+                                                htmlFor={`membership-role-${role.id}`}
                                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                             >
-                                                {permission.permission}
+                                                {role.roleName}
                                             </label>
                                             <p className="text-xs text-muted-foreground">
-                                                {permission.description}
+                                                {role.description}
                                             </p>
                                         </div>
                                     </div>
@@ -229,19 +215,19 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
                             <div className="flex flex-col items-center justify-center p-6 bg-muted rounded-md">
                                 <p className="text-sm text-muted-foreground">
                                     {searchQuery
-                                        ? "No permissions match your search"
-                                        : "No available permissions to add"}
+                                        ? "No roles match your search"
+                                        : "No available roles to add"}
                                 </p>
                             </div>
                         )}
 
                         {/* Pagination */}
-                        {filteredPermissions.length > itemsPerPage && (
+                        {filteredRoles.length > itemsPerPage && (
                             <DataTablePagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 itemsPerPage={itemsPerPage}
-                                totalItems={filteredPermissions.length}
+                                totalItems={filteredRoles.length}
                                 visibleItems={currentItems.length}
                                 onPageChange={handlePageChange}
                                 onItemsPerPageChange={handleItemsPerPageChange}
@@ -254,17 +240,17 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
             <div className="flex gap-2">
                 <Button
                     onClick={handleSave}
-                    disabled={isSaving || selectedPermissions.length === 0}
+                    disabled={isSaving || selectedRoles.length === 0}
                 >
                     {isSaving
                         ? "Saving..."
-                        : `Add ${selectedPermissions.length} Permission${
-                              selectedPermissions.length !== 1 ? "s" : ""
+                        : `Add ${selectedRoles.length} Role${
+                              selectedRoles.length !== 1 ? "s" : ""
                           }`}
                 </Button>
                 <Button
                     variant="outline"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() => router.push(`/memberships/${membershipId}`)}
                 >
                     Cancel
                 </Button>

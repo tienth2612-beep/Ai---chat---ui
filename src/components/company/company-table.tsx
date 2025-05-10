@@ -22,10 +22,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { DataTableSearch } from "../data-table-search";
 import { DateRange } from "react-day-picker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCompany } from "@/hooks/use-company";
 import { toast } from "sonner";
 import { DataTablePagination } from "../ui/data-table-pagination";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function CompanyTable() {
     const {
@@ -81,6 +87,9 @@ export function CompanyTable() {
             });
         }
     };
+    useEffect(() => {
+        fetchCompanies({});
+    }, []);
 
     const handleSearch = ({
         searchTerm,
@@ -105,6 +114,24 @@ export function CompanyTable() {
         setCurrentPage(1); // Reset to first page when items per page changes
         fetchCompanies({ page: 1, limit: newItemsPerPage });
     };
+    const truncateText = (text: string, maxLength: number) => {
+        if (!text) return "";
+        if (text.length <= maxLength) return text;
+        return (
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="cursor-help">
+                            {text.substring(0, maxLength)}...
+                        </span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[300px] break-words">
+                        <p>{text}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        );
+    };
 
     return (
         <div className="space-y-4">
@@ -114,97 +141,161 @@ export function CompanyTable() {
                 initialSearchTerm={currentSearchTerm}
                 initialDateRange={currentDateRange}
             />
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Website</TableHead>
-                            <TableHead>Address</TableHead>
-                            <TableHead>City</TableHead>
-                            <TableHead>State</TableHead>
-                            <TableHead>Zip Code</TableHead>
-                            <TableHead className="text-right">
-                                Actions
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
+            <div className="rounded-md border overflow-hidden p-4">
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
                             <TableRow>
-                                <TableCell
-                                    colSpan={7}
-                                    className="h-24 text-center"
-                                >
-                                    <div className="flex items-center justify-center">
-                                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                                        <span className="ml-2">
-                                            Loading Companies...
-                                        </span>
-                                    </div>
-                                </TableCell>
+                                <TableHead className="w-[200px]">
+                                    Name
+                                </TableHead>
+                                <TableHead className="w-[200px]">
+                                    Description
+                                </TableHead>
+                                <TableHead className="w-[150px]">
+                                    Phone
+                                </TableHead>
+                                <TableHead className="w-[150px]">
+                                    Email
+                                </TableHead>
+                                <TableHead className="w-[150px]">
+                                    Website
+                                </TableHead>
+                                <TableHead className="w-[150px]">
+                                    Address
+                                </TableHead>
+                                <TableHead className="w-[150px]">
+                                    City
+                                </TableHead>
+                                <TableHead className="w-[150px]">
+                                    State
+                                </TableHead>
+                                <TableHead className="w-[150px]">
+                                    Zip Code
+                                </TableHead>
+                                <TableHead className="text-right">
+                                    Actions
+                                </TableHead>
                             </TableRow>
-                        ) : companies.length === 0 ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={6}
-                                    className="h-24 text-center"
-                                >
-                                    No companies found.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            companies.map((company) => (
-                                <TableRow key={company.id}>
-                                    <TableCell className="font-medium">
-                                        {company.name}
-                                    </TableCell>
-                                    <TableCell>{company.description}</TableCell>
-                                    <TableCell>{company.phone}</TableCell>
-                                    <TableCell>{company.email}</TableCell>
-                                    <TableCell>{company.website}</TableCell>
-                                    <TableCell>{company.street1}</TableCell>
-                                    <TableCell>{company.city}</TableCell>
-                                    <TableCell>{company.state}</TableCell>
-                                    <TableCell>{company.zipCode}</TableCell>
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    className="h-8 w-8 p-0"
-                                                >
-                                                    <span className="sr-only">
-                                                        Open menu
-                                                    </span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>
-                                                    Actions
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem asChild>
-                                                    <Link
-                                                        href={`/companies/${company.id}`}
-                                                    >
-                                                        <View className="mr-2 h-4 w-4" />
-                                                        View details
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                        </TableHeader>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={7}
+                                        className="h-24 text-center"
+                                    >
+                                        <div className="flex items-center justify-center">
+                                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                                            <span className="ml-2">
+                                                Loading Companies...
+                                            </span>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                            ) : companies.length === 0 ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={6}
+                                        className="h-24 text-center"
+                                    >
+                                        No companies found.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                companies.map((company) => (
+                                    <TableRow key={company.id}>
+                                        <TableCell className="font-medium w-[200px]">
+                                            {truncateText(
+                                                company.name ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[200px]">
+                                            {truncateText(
+                                                company.description ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[150px]">
+                                            {truncateText(
+                                                company.phone ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[150px]">
+                                            {truncateText(
+                                                company.email ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[150px]">
+                                            {truncateText(
+                                                company.website ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[150px]">
+                                            {truncateText(
+                                                company.street1 ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[150px]">
+                                            {truncateText(
+                                                company.city ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[150px]">
+                                            {truncateText(
+                                                company.state ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="w-[150px]">
+                                            {truncateText(
+                                                company.zipCode ?? "",
+                                                30
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="h-8 w-8 p-0"
+                                                    >
+                                                        <span className="sr-only">
+                                                            Open menu
+                                                        </span>
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuLabel>
+                                                        Actions
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem asChild>
+                                                        <Link
+                                                            href={`/companies/${company.id}`}
+                                                        >
+                                                            <View className="mr-2 h-4 w-4" />
+                                                            View details
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
+
             {/* Pagination controls */}
             {totalCompanies > 0 && (
                 <DataTablePagination

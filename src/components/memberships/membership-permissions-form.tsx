@@ -12,116 +12,153 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { ArrowLeft, Search } from "lucide-react";
-import * as rbacModel from "@/types/rbac";
+import * as RbacModel from "@/types/rbac";
 import { DataTablePagination } from "../ui/data-table-pagination";
+import { Input } from "../ui/input";
 
-interface RoleAddPermissionsProps {
-    roleId: string;
+interface MembershipPermissionsFormProps {
+    membershipId: string;
+    currentPermissions: number[];
+    onSave: (
+        permissions: RbacModel.CreateAssignRequest
+    ) => Promise<true | null>;
 }
 
-export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
+// Add type for permission filtering
+type PermissionFilter = {
+    searchQuery: string;
+    itemsPerPage: number;
+    currentPage: number;
+};
+
+// Extract permission filtering logic into a separate function
+const filterPermissions = (
+    permissions: RbacModel.PermissionResponse[],
+    permissionsOfPackage: RbacModel.PermissionResponse[],
+    filter: PermissionFilter
+) => {
+    const permissionsOfPackageIds = permissionsOfPackage.map((p) => p.id);
+    const availablePermissions = permissions.filter(
+        (p) => !permissionsOfPackageIds.includes(p.id)
+    );
+
+    const searchFiltered = availablePermissions.filter(
+        (p) =>
+            p.permission
+                .toLowerCase()
+                .includes(filter.searchQuery.toLowerCase()) ||
+            p.description
+                .toLowerCase()
+                .includes(filter.searchQuery.toLowerCase())
+    );
+
+    const startIndex = (filter.currentPage - 1) * filter.itemsPerPage;
+    const endIndex = startIndex + filter.itemsPerPage;
+    const paginatedPermissions = searchFiltered.slice(startIndex, endIndex);
+
+    return {
+        filteredPermissions: searchFiltered,
+        currentItems: paginatedPermissions,
+        totalPages: Math.ceil(searchFiltered.length / filter.itemsPerPage),
+    };
+};
+
+export function MembershipPermissionsForm({
+    membershipId,
+    currentPermissions,
+    onSave,
+}: MembershipPermissionsFormProps) {
     const router = useRouter();
     const {
-        getRole,
-        createRoleAssignment,
         getPermissions,
-        getRoleAssignments,
-        isLoading,
+        isLoading: permissionsLoading,
+        permissionsOfPackage,
+        getAssignOfPackage,
         permissions,
-        permissionsOfRole,
-        role,
-        isLoading: roleLoading,
     } = useRbac();
-    const [filteredPermissions, setFilteredPermissions] = useState<
-        rbacModel.PermissionResponse[]
-    >([]);
-    const [selectedPermissions, setSelectedPermissions] = useState<number[]>(
-        []
-    );
-    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedPermissions, setSelectedPermissions] =
+        useState<number[]>(currentPermissions);
     const [isSaving, setIsSaving] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [filteredPermissions, setFilteredPermissions] = useState<
+        RbacModel.PermissionResponse[]
+    >([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            await Promise.all([getRole(Number(roleId)), getPermissions()]);
-
-            if (permissions) {
-                // Filter out permissions that are already assigned to the role
-                const permissionsOfRoleIds = permissionsOfRole.map((p) => p.id);
-                const availablePermissions = permissions.filter(
-                    (p) => !permissionsOfRoleIds.includes(p.id)
-                );
-                setFilteredPermissions(availablePermissions);
-                setTotalPages(
-                    Math.ceil(availablePermissions.length / itemsPerPage)
-                );
+        const fetchPermissions = async () => {
+            try {
+                await Promise.all([
+                    getPermissions(),
+                    getAssignOfPackage(Number(membershipId), {}),
+                ]);
+            } catch (err) {
+                toast.error("Failed to fetch permissions. Please try again.");
             }
         };
 
-        fetchData();
-    }, [roleId, getRole, getPermissions]);
+        fetchPermissions();
+    }, [getPermissions, getAssignOfPackage, membershipId]);
 
     useEffect(() => {
-        // Filter permissions based on search query
-        const filtered = permissions.filter(
-            (p) =>
-                p.permission
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase()) ||
-                p.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setFilteredPermissions(filtered);
-        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-        setCurrentPage(1); // Reset to first page on new search
-    }, [searchQuery, permissions]);
+        if (permissionsOfPackage && permissions) {
+            const {
+                filteredPermissions: newFiltered,
+                totalPages: newTotalPages,
+            } = filterPermissions(permissions, permissionsOfPackage, {
+                searchQuery,
+                itemsPerPage,
+                currentPage,
+            });
+
+            setFilteredPermissions(newFiltered);
+            setTotalPages(newTotalPages);
+            //setSelectedPermissions(permissionsOfPackage.map((p) => p.id));
+        }
+    }, [
+        permissionsOfPackage,
+        permissions,
+        searchQuery,
+        itemsPerPage,
+        currentPage,
+    ]);
 
     const handlePermissionChange = (permissionId: number, checked: boolean) => {
-        if (checked) {
-            setSelectedPermissions((prev) => [...prev, permissionId]);
-        } else {
-            setSelectedPermissions((prev) =>
-                prev.filter((id) => id !== permissionId)
-            );
-        }
+        setSelectedPermissions((prev) =>
+            checked
+                ? [...prev, permissionId]
+                : prev.filter((id) => id !== permissionId)
+        );
     };
 
     const handleSave = async () => {
-        if (!role || selectedPermissions.length === 0) return;
-
         setIsSaving(true);
+        console.log(selectedPermissions);
         try {
-            // Get the permission codes from the selected IDs
-            const permissionCodes = selectedPermissions
-                .map(
-                    (id) =>
-                        permissions.find((p) => p.id === id)?.permission || ""
-                )
-                .filter((code) => code !== "");
-
-            const success = await createRoleAssignment({
-                objectId: Number(roleId),
-                permissions: selectedPermissions.map((id) => ({
-                    permissionId: id,
+            const success = await onSave({
+                objectId: Number(membershipId),
+                permissions: selectedPermissions.map((permission) => ({
+                    permissionId: permission,
                 })),
+                type: 1,
             });
-
             if (success) {
                 toast.success(
-                    `${selectedPermissions.length} permissions have been added to this role.`
+                    "Membership permissions have been updated successfully"
                 );
-                router.push(`/rbac/roles/${roleId}`);
+                router.push(`/memberships/${membershipId}`);
+            } else {
+                throw new Error("Failed to save permissions");
             }
-        } catch (error) {
-            toast.error(
-                "An error occurred while adding permissions. Please try again."
-            );
+        } catch (err) {
+            const errorMessage =
+                "An error occurred while updating permissions. Please try again.";
+            toast.error(errorMessage);
         } finally {
             setIsSaving(false);
         }
@@ -139,7 +176,6 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
         setCurrentPage(1); // Reset to first page when items per page changes
         getPermissions({ page: 1, pageSize: newItemsPerPage });
     };
-
     // Get current items for pagination
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -147,8 +183,7 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
         indexOfFirstItem,
         indexOfLastItem
     );
-
-    if (roleLoading || isLoading) {
+    if (permissionsLoading) {
         return (
             <div className="space-y-4">
                 <Skeleton className="h-10 w-[150px]" />
@@ -157,27 +192,27 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
         );
     }
 
-    if (!role) {
-        return <div>Role not found</div>;
-    }
-
     return (
         <div className="space-y-6">
             <div className="flex justify-between">
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() => router.push(`/memberships/${membershipId}`)}
                 >
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Role
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Membership
                 </Button>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Add Permissions to {role.roleName}</CardTitle>
+                    <CardTitle>
+                        Assign Extra Permissions to Membership
+                    </CardTitle>
                     <CardDescription>
-                        Select the permissions you want to add to this role.
+                        Select additional permissions that will be granted to
+                        all users with this membership, regardless of their
+                        role.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -248,23 +283,50 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
                             />
                         )}
                     </div>
+                    {/* <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                            {permissions.map((permission) => (
+                                <div
+                                    key={permission.id}
+                                    className="flex items-start space-x-3 space-y-0"
+                                >
+                                    <Checkbox
+                                        id={`membership-${permission.id}`}
+                                        checked={selectedPermissions.includes(
+                                            permission.id
+                                        )}
+                                        onCheckedChange={(checked) =>
+                                            handlePermissionChange(
+                                                permission.id,
+                                                checked as boolean
+                                            )
+                                        }
+                                    />
+                                    <div className="space-y-1 leading-none">
+                                        <label
+                                            htmlFor={`membership-${permission.id}`}
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                            {permission.permission}
+                                        </label>
+                                        <p className="text-xs text-muted-foreground">
+                                            {permission.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div> */}
                 </CardContent>
             </Card>
 
             <div className="flex gap-2">
-                <Button
-                    onClick={handleSave}
-                    disabled={isSaving || selectedPermissions.length === 0}
-                >
-                    {isSaving
-                        ? "Saving..."
-                        : `Add ${selectedPermissions.length} Permission${
-                              selectedPermissions.length !== 1 ? "s" : ""
-                          }`}
+                <Button onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Save Permissions"}
                 </Button>
                 <Button
                     variant="outline"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() => router.push(`/memberships/${membershipId}`)}
                 >
                     Cancel
                 </Button>

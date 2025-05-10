@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import {
@@ -69,6 +69,9 @@ export function UserTable() {
             });
         }
     };
+    useEffect(() => {
+        fetchUsers({});
+    }, []);
 
     const handleSearch = ({
         searchTerm,
@@ -103,72 +106,73 @@ export function UserTable() {
                 initialDateRange={currentDateRange}
             />
 
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Created</TableHead>
-                            {/* <TableHead className="text-right">
+            <div className="rounded-md border overflow-hidden p-4">
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead>Phone</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Created</TableHead>
+                                {/* <TableHead className="text-right">
                                 Actions
                             </TableHead> */}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={7}
-                                    className="h-24 text-center"
-                                >
-                                    <div className="flex items-center justify-center">
-                                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                                        <span className="ml-2">
-                                            Loading users...
-                                        </span>
-                                    </div>
-                                </TableCell>
                             </TableRow>
-                        ) : users.length === 0 ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={7}
-                                    className="h-24 text-center"
-                                >
-                                    No users found matching your criteria.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            users.map((user) => (
-                                <TableRow key={user.id}>
-                                    <TableCell className="font-medium">
-                                        {user.name}
+                        </TableHeader>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={7}
+                                        className="h-24 text-center"
+                                    >
+                                        <div className="flex items-center justify-center">
+                                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                                            <span className="ml-2">
+                                                Loading users...
+                                            </span>
+                                        </div>
                                     </TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.phone}</TableCell>
-                                    <TableCell>
-                                        <Badge
-                                            variant={
-                                                user.status === 1
-                                                    ? "default"
-                                                    : "secondary"
-                                            }
-                                        >
-                                            {user.status === 1
-                                                ? "Active"
-                                                : "Inactive"}
-                                        </Badge>
+                                </TableRow>
+                            ) : users.length === 0 ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={7}
+                                        className="h-24 text-center"
+                                    >
+                                        No users found matching your criteria.
                                     </TableCell>
-                                    <TableCell>
-                                        {format(
-                                            new Date(user.createAt),
-                                            "MMM d, yyyy"
-                                        )}
-                                    </TableCell>
-                                    {/* <TableCell className="text-right">
+                                </TableRow>
+                            ) : (
+                                users.map((user) => (
+                                    <TableRow key={user.id}>
+                                        <TableCell className="font-medium">
+                                            {user.name}
+                                        </TableCell>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{user.phone}</TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={
+                                                    user.status === 1
+                                                        ? "default"
+                                                        : "secondary"
+                                                }
+                                            >
+                                                {user.status === 1
+                                                    ? "Active"
+                                                    : "Inactive"}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            {format(
+                                                new Date(user.createAt),
+                                                "MMM d, yyyy"
+                                            )}
+                                        </TableCell>
+                                        {/* <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button
@@ -208,11 +212,12 @@ export function UserTable() {
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell> */}
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
 
             {/* Pagination controls */}

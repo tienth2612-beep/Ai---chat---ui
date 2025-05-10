@@ -86,6 +86,7 @@ export interface RoleRequest {
 
 export interface UpdateAssignRequest {
     id: number;
+    packageId: number;
     active: boolean;
 }
 

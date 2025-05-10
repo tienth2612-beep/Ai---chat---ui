@@ -1,11 +1,12 @@
 "use client";
-import { MembershipPermissionsForm } from "@/components/rbac/membership-permissions-form";
+import { MembershipPermissionsForm } from "@/components/memberships/membership-permissions-form";
 import { Separator } from "@/components/ui/separator";
 import { useParams } from "next/navigation";
 import { useRbac } from "@/hooks/use-rbac";
 import { useMemberships } from "@/hooks/use-membership";
 import { useState, useEffect } from "react";
 import * as RbacModel from "@/types/rbac";
+import { toast } from "sonner";
 
 export default function MembershipPermissionsPage() {
     const { id } = useParams();
@@ -13,19 +14,22 @@ export default function MembershipPermissionsPage() {
         useRbac();
     const { getMembershipById, membership } = useMemberships();
     useEffect(() => {
-        const fetchMembership = async () => {
-            await getMembershipById(id as string);
-        };
-        const fetchAssignOfPackage = async () => {
-            await getAssignOfPackage(Number(id), {});
-        };
-        fetchMembership();
-        fetchAssignOfPackage();
+        async function fetchData() {
+            console.log(id);
+            try {
+                await getMembershipById(id as string);
+                await getAssignOfPackage(Number(id));
+            } catch (error) {
+                console.error("Error fetching membership:", error);
+                toast.error("Failed to fetch membership details");
+            }
+        }
+        fetchData();
     }, [id, getMembershipById, getAssignOfPackage]);
 
-    if (!membership) {
-        return <div>Membership not found</div>;
-    }
+    // if (!membership) {
+    //     return <div>Membership not found</div>;
+    // }
 
     return (
         <div className="space-y-6">
@@ -34,7 +38,7 @@ export default function MembershipPermissionsPage() {
                     Membership Extra Permissions
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                    Manage additional permissions for the {membership.name}{" "}
+                    Manage additional permissions for the {membership?.name}{" "}
                     membership.
                 </p>
             </div>

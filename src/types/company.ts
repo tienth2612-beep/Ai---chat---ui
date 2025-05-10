@@ -61,4 +61,35 @@ export interface DetailCompanyResponse {
     industries: string | null;
     totalMember: string | null;
 }
+
+export interface CompanyMetricsResponse {
+    companyId: number;
+    clientId: number;
+    invoiceCount: number;
+    invoiceTotal: number;
+    invoicePaid: number;
+    quoteCount: number;
+    quoteTotal: number;
+    jobCount: number;
+    jobTotal: number;
+}
+
+export interface CompanyActiveWorkResponse {
+    id: number;
+    no: string | null;
+    clientId: number;
+    type: string | null;
+    dueDate: string;
+    status: number;
+    createAt: string;
+    updateAt: string;
+    total: number;
+    street1: string | null;
+    street2: string | null;
+    city: string | null;
+    state: string | null;
+    zip: string | null;
+    country: string | null;
+    title: string | null;
+}
 //#endregion

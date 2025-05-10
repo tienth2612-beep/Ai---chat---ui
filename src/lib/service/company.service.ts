@@ -1,6 +1,9 @@
 import api from "../axios";
 import { BaseResultWithData, PageResult } from "@/types/api";
 import * as CompanyModel from "@/types/company";
+import * as JobModel from "@/types/job";
+import * as QuoteModel from "@/types/quote";
+import * as InvoiceModel from "@/types/invoice";
 import * as UserModel from "@/types/user";
 import { API_URL } from "../constants";
 import { AxiosError } from "axios";
@@ -46,5 +49,38 @@ export const companyService = {
             }
             throw error;
         }
+    },
+
+    GetCompanyActiveWork: async (
+        id: number
+    ): Promise<PageResult<CompanyModel.CompanyActiveWorkResponse>> => {
+        return api.get(`${API_URL.COMPANY}/${id}/active-works`);
+    },
+
+    GetCompanyMetrics: async (
+        id: number
+    ): Promise<BaseResultWithData<CompanyModel.CompanyMetricsResponse>> => {
+        return api.get(`${API_URL.COMPANY}/${id}/metrics`);
+    },
+
+    GetCompanyJobs: async (
+        id: number,
+        data: Partial<JobModel.GetJobsRequest>
+    ): Promise<PageResult<JobModel.JobResponse>> => {
+        return api.get(`${API_URL.COMPANY}/${id}/jobs`, { params: data });
+    },
+
+    GetCompanyQuotes: async (
+        id: number,
+        data: Partial<QuoteModel.GetQuotesRequest>
+    ): Promise<PageResult<QuoteModel.QuotesResponse>> => {
+        return api.get(`${API_URL.COMPANY}/${id}/quotes`, { params: data });
+    },
+
+    GetCompanyInvoices: async (
+        id: number,
+        data: Partial<InvoiceModel.GetInvoicesRequest>
+    ): Promise<PageResult<InvoiceModel.InvoicesResponse>> => {
+        return api.get(`${API_URL.COMPANY}/${id}/invoices`, { params: data });
     },
 };
