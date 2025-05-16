@@ -84,6 +84,46 @@ export function useAuth() {
         [router]
     );
 
+    // Google Login
+    const googleLogin = useCallback(
+        async (token: string) => {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const response = await authService.googleLogin(token);
+
+                if (response.isSuccess && response.data) {
+                    // Set user data
+                    setUser({
+                        userId: response.data.userId,
+                        name: response.data.name,
+                        email: response.data.email,
+                        token: response.data.token,
+                    });
+
+                    // Store session in cookie
+                    setCookie("session", JSON.stringify(response.data), 1); // 7 days
+
+                    // Redirect to dashboard
+                    router.push("/dashboard");
+                    router.refresh();
+                    return true;
+                } else {
+                    setError(response.message || "Google login failed");
+                    return false;
+                }
+            } catch (error) {
+                console.error("Google login error:", error);
+                setError("An unexpected error occurred. Please try again.");
+                return false;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [router]
+    );
+
     // Register
     const register = useCallback(
         async (data: UserAuth.RegisterRequest) => {
@@ -160,5 +200,6 @@ export function useAuth() {
         register,
         logout,
         checkAuth,
+        googleLogin,
     };
 }

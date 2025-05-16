@@ -29,6 +29,7 @@ import {
     Key,
     ShieldCheck,
     Lock,
+    ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -51,6 +52,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false);
+    const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
     const handleLogout = async () => {
         await logout();
@@ -62,11 +64,24 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
         router.push(href);
     };
 
+    const toggleSubmenu = (href: string) => {
+        setExpandedMenus((prev) =>
+            prev.includes(href)
+                ? prev.filter((item) => item !== href)
+                : [...prev, href]
+        );
+    };
+
     const navItems = [
         {
             title: "Dashboard",
             href: "/dashboard",
             icon: LayoutDashboard,
+        },
+        {
+            title: "Auth Users",
+            href: "/auth-users",
+            icon: Users,
         },
         {
             title: "RBAC",
@@ -90,11 +105,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
             href: "/companies",
             icon: Building2,
         },
-        {
-            title: "Users",
-            href: "/users",
-            icon: Users,
-        },
+
         {
             title: "Memberships",
             href: "/memberships",
@@ -102,8 +113,15 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
         },
         {
             title: "Settings",
-            href: "/dashboard/settings",
+            href: "/settings",
             icon: Settings,
+            submenu: [
+                {
+                    title: "Industries",
+                    href: "/settings/industries",
+                    icon: Building2,
+                },
+            ],
         },
     ];
 
@@ -167,6 +185,9 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                     pathname === item.href ||
                                     (item.href !== "/" &&
                                         pathname.startsWith(item.href));
+                                const isSubmenuExpanded =
+                                    expandedMenus.includes(item.href);
+
                                 // Render submenu items if they exist
                                 if (item.submenu && !collapsed) {
                                     return (
@@ -176,75 +197,94 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                         >
                                             <button
                                                 onClick={() =>
-                                                    handleNavigation(item.href)
+                                                    toggleSubmenu(item.href)
                                                 }
                                                 className={cn(
-                                                    "group relative flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                                                    "group relative flex w-full items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200",
                                                     isActive
                                                         ? "bg-primary/10 text-primary"
                                                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                                 )}
                                             >
-                                                <item.icon
+                                                <div className="flex items-center">
+                                                    <item.icon
+                                                        className={cn(
+                                                            "h-5 w-5 shrink-0 transition-all mr-3",
+                                                            isActive
+                                                                ? "text-primary"
+                                                                : "text-muted-foreground group-hover:text-foreground"
+                                                        )}
+                                                    />
+                                                    <span className="truncate">
+                                                        {item.title}
+                                                    </span>
+                                                </div>
+                                                <ChevronDown
                                                     className={cn(
-                                                        "h-5 w-5 shrink-0 transition-all mr-3",
-                                                        isActive
-                                                            ? "text-primary"
-                                                            : "text-muted-foreground group-hover:text-foreground"
+                                                        "h-4 w-4 transition-transform duration-200",
+                                                        isSubmenuExpanded
+                                                            ? "rotate-180"
+                                                            : ""
                                                     )}
                                                 />
-                                                <span className="truncate">
-                                                    {item.title}
-                                                </span>
                                                 {isActive && (
                                                     <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-md" />
                                                 )}
                                             </button>
 
                                             {/* Submenu items */}
-                                            <div className="pl-8 space-y-1">
-                                                {item.submenu.map((subItem) => {
-                                                    const isSubActive =
-                                                        pathname ===
-                                                            subItem.href ||
-                                                        pathname.startsWith(
-                                                            subItem.href + "/"
-                                                        );
-                                                    return (
-                                                        <button
-                                                            key={subItem.href}
-                                                            onClick={() =>
-                                                                handleNavigation(
-                                                                    subItem.href
-                                                                )
-                                                            }
-                                                            className={cn(
-                                                                "group relative flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
-                                                                isSubActive
-                                                                    ? "bg-primary/10 text-primary"
-                                                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                                                            )}
-                                                        >
-                                                            {subItem.icon && (
-                                                                <subItem.icon
+                                            {isSubmenuExpanded && (
+                                                <div className="pl-8 space-y-1">
+                                                    {item.submenu.map(
+                                                        (subItem) => {
+                                                            const isSubActive =
+                                                                pathname ===
+                                                                    subItem.href ||
+                                                                pathname.startsWith(
+                                                                    subItem.href +
+                                                                        "/"
+                                                                );
+                                                            return (
+                                                                <button
+                                                                    key={
+                                                                        subItem.href
+                                                                    }
+                                                                    onClick={() =>
+                                                                        handleNavigation(
+                                                                            subItem.href
+                                                                        )
+                                                                    }
                                                                     className={cn(
-                                                                        "h-4 w-4 shrink-0 transition-all mr-3",
+                                                                        "group relative flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
                                                                         isSubActive
-                                                                            ? "text-primary"
-                                                                            : "text-muted-foreground group-hover:text-foreground"
+                                                                            ? "bg-primary/10 text-primary"
+                                                                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                                                     )}
-                                                                />
-                                                            )}
-                                                            <span className="truncate">
-                                                                {subItem.title}
-                                                            </span>
-                                                            {isSubActive && (
-                                                                <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-md" />
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
+                                                                >
+                                                                    {subItem.icon && (
+                                                                        <subItem.icon
+                                                                            className={cn(
+                                                                                "h-4 w-4 shrink-0 transition-all mr-3",
+                                                                                isSubActive
+                                                                                    ? "text-primary"
+                                                                                    : "text-muted-foreground group-hover:text-foreground"
+                                                                            )}
+                                                                        />
+                                                                    )}
+                                                                    <span className="truncate">
+                                                                        {
+                                                                            subItem.title
+                                                                        }
+                                                                    </span>
+                                                                    {isSubActive && (
+                                                                        <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-md" />
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        }
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 }

@@ -15,6 +15,15 @@ import {
     FileText,
     Briefcase,
     ChevronRight,
+    User,
+    Shield,
+    UserCheck,
+    Calendar,
+    ChevronDown,
+    ChevronUp,
+    Copy,
+    CheckCircle2,
+    ExternalLink,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -37,34 +46,65 @@ import { CompanyQuotesTable } from "./company-quotes-table";
 import { CompanyJobsTable } from "./company-jobs-table";
 import { CompanyInvoicesTable } from "./company-invoices-table";
 import { CompanyActiveTable } from "./company-active-table";
-
+import * as UserModel from "@/types/user";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { CompanyPaymentHistory } from "./company-payment-history";
+import { CompanyUserInfoCard } from "./company-user-info-card";
 interface CompanyDetailProps {
     companyId: string;
+}
+interface BusinessHour {
+    day: string;
+    isOpen: boolean;
+    openTime: string;
+    closeTime: string;
 }
 
 export function CompanyDetail({ companyId }: CompanyDetailProps) {
     const router = useRouter();
     const {
-        getCompanyById,
+        users,
         isLoading,
         error,
         companyActiveWork,
         companyMetrics,
+        totalUsers,
+        getCompanyById,
         getCompanyMetrics,
         getCompanyActiveWork,
+        getUserByCompanyId,
     } = useCompany();
     const [company, setCompany] =
         useState<CompanyModel.DetailCompanyResponse | null>(null);
-    const [activeTab, setActiveTab] = useState("active");
-
+    const [activeTab, setActiveTab] = useState("overview");
+    const [owner, setOwner] = useState<UserModel.UserResponse | undefined>(
+        undefined
+    );
+    const [admin, setAdmin] = useState<UserModel.UserResponse | undefined>(
+        undefined
+    );
+    const [showAllHours, setShowAllHours] = useState(false);
     useEffect(() => {
         async function fetchCompany() {
             try {
+                const filters: Partial<UserModel.GetAllUsersRequest> = {
+                    search: "",
+                    page: 1,
+                    pageSize: 100,
+                };
                 const companyData = await getCompanyById(companyId);
                 const companyActiveWorkData = await getCompanyActiveWork(
                     companyId
                 );
                 const companyMetricsData = await getCompanyMetrics(companyId);
+                const users = await getUserByCompanyId(companyId, filters);
+                if (users && users.length > 0) {
+                    const owner = users.find((x) => x.role === 5);
+                    setOwner(owner);
+                    const admin = users.find((x) => x.role === 1);
+                    setAdmin(admin);
+                }
+
                 if (companyData) {
                     setCompany(companyData);
                 } else {
@@ -83,6 +123,82 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
         router.push("/companies");
     };
 
+    const getInitials = (name: string) => {
+        return name
+            .split(" ")
+            .map((part) => part[0])
+            .join("")
+            .toUpperCase()
+            .substring(0, 2);
+    };
+    const formatTime = (time: string) => {
+        // Convert 24h format to 12h format if needed
+        if (company?.timeFormat?.includes("hh:mm A")) {
+            const [hours, minutes] = time.split(":");
+            const hour = Number.parseInt(hours, 10);
+            const ampm = hour >= 12 ? "PM" : "AM";
+            const hour12 = hour % 12 || 12;
+            return `${hour12}:${minutes} ${ampm}`;
+        }
+        return time;
+    };
+
+    const getStatusBadge = (status: number) => {
+        switch (status) {
+            case 1:
+                return (
+                    <Badge className="bg-green-500 hover:bg-green-600">
+                        Active
+                    </Badge>
+                );
+            case 0:
+            default:
+                return (
+                    <Badge variant="outline" className="text-muted-foreground">
+                        Inactive
+                    </Badge>
+                );
+        }
+    };
+    // Parse business hours from JSON string
+    const businessHours: BusinessHour[] = company?.businessHours
+        ? JSON.parse(company.businessHours)
+        : [];
+
+    // Sort business hours to start with the first day of the week
+    const sortedBusinessHours = [...businessHours].sort((a, b) => {
+        const days = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        ];
+        const firstDay = company?.firstDayOfWeek || 0;
+
+        const aIndex = days.indexOf(a.day);
+        const bIndex = days.indexOf(b.day);
+
+        const aAdjusted = (aIndex - firstDay + 7) % 7;
+        const bAdjusted = (bIndex - firstDay + 7) % 7;
+
+        return aAdjusted - bAdjusted;
+    });
+    const getFullAddress = () => {
+        if (!company) return "";
+        const parts = [
+            company.street1,
+            company.street2,
+            company.city,
+            company.state,
+            company.zipCode,
+            company.country,
+        ].filter(Boolean);
+
+        return parts.join(", ");
+    };
     if (isLoading) {
         return (
             <div className="flex h-[400px] w-full items-center justify-center">
@@ -138,15 +254,15 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className="hidden sm:block">
+                        {/* <div className="hidden sm:block">
                             {company.description && (
                                 <p className="max-w-md text-muted-foreground">
                                     {company.description}
                                 </p>
                             )}
-                        </div>
+                        </div> */}
                     </div>
-                    <div className="grid gap-6 md:grid-cols-2 mt-4">
+                    <div className="grid gap-6 md:grid-cols-3 mt-4">
                         <div className="space-y-4">
                             <div className="flex items-center space-x-3">
                                 <Building2 className="h-5 w-5 text-muted-foreground" />
@@ -155,7 +271,7 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                                         Industry
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        {company.industries}
+                                        {company.industries || "Unknown"}
                                     </p>
                                 </div>
                             </div>
@@ -192,41 +308,28 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3">
-                                <Globe className="h-5 w-5 text-muted-foreground" />
-                                <div>
-                                    <p className="text-sm font-medium">
-                                        Website
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        <a
-                                            href={company.website ?? ""}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="hover:underline"
-                                        >
-                                            {company.website ?? ""}
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
                                 <MapPin className="h-5 w-5 text-muted-foreground" />
                                 <div>
                                     <p className="text-sm font-medium">
                                         Address
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        {company.street1 ?? ""}
-                                        {company.street2 ?? ""}
+                                        {company.city ?? " "}{" "}
+                                        {company.state ?? " "}
+                                        {/* {company.zipCode ?? ""} */}
                                     </p>
                                 </div>
                             </div>
+                        </div>
+                        <div className="space-y-4">
+                            {owner && <CompanyUserInfoCard user={owner} />}
+                            {admin && <CompanyUserInfoCard user={admin} />}
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
                 <CompanyMetricCard
                     title="Quotes"
                     value={`$${companyMetrics?.quoteTotal.toLocaleString()}`}
@@ -245,6 +348,14 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                     count={companyMetrics?.invoiceCount}
                     icon={<Receipt className="h-5 w-5" />}
                 />
+                <CompanyMetricCard
+                    title="Team Members"
+                    value={`${
+                        users.filter((x) => x.status === 1).length
+                    } Members active`}
+                    count={totalUsers}
+                    icon={<Users className="h-5 w-5" />}
+                />
             </div>
 
             <Tabs
@@ -253,165 +364,196 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                 onValueChange={setActiveTab}
                 className="space-y-4"
             >
-                <TabsList className="grid w-full grid-cols-5 lg:w-auto">
-                    <TabsTrigger value="active">Active Work</TabsTrigger>
-                    <TabsTrigger value="members">Members</TabsTrigger>
-
-                    <TabsTrigger value="quotes">Quotes</TabsTrigger>
-                    <TabsTrigger value="jobs">Jobs</TabsTrigger>
-                    <TabsTrigger value="invoices">Invoices</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 lg:w-auto">
+                    <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <TabsTrigger value="payments">Payment History</TabsTrigger>
                 </TabsList>
-                <TabsContent value="members" className="space-y-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <div className="space-y-1">
-                                <CardTitle>Team Members</CardTitle>
+                <TabsContent value="overview" className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Contact Information</CardTitle>
                                 <CardDescription>
-                                    People working with this company
+                                    Basic contact details for this company
                                 </CardDescription>
-                            </div>
-                            {/* <Button variant="outline" size="sm">
-                                Add Member
-                            </Button> */}
-                        </CardHeader>
-                        <CardContent>
-                            <CompanyUserTable
-                                companyId={company.id.toString()}
-                            />
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-start gap-3">
+                                    <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                    <div className="flex-1">
+                                        <p className="font-medium text-sm">
+                                            Phone
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <a
+                                                href={`tel:${company.phone}`}
+                                                className="text-muted-foreground hover:text-foreground transition-colors"
+                                            >
+                                                {company.phone}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
 
-                <TabsContent value="active" className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-3">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <div className="space-y-1">
-                                    <CardTitle>Recent Quotes</CardTitle>
-                                    <CardDescription>
-                                        Latest quotes for this company
-                                    </CardDescription>
+                                <div className="flex items-start gap-3">
+                                    <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                    <div className="flex-1">
+                                        <p className="font-medium text-sm">
+                                            Email
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <a
+                                                href={`mailto:${company.email}`}
+                                                className="text-muted-foreground hover:text-foreground transition-colors break-all"
+                                            >
+                                                {company.email}
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="gap-1"
-                                    onClick={() => setActiveTab("quotes")}
-                                >
-                                    View all{" "}
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
-                            </CardHeader>
-                            <CardContent>
-                                <CompanyActiveTable
-                                    activeItems={companyActiveWork.filter(
-                                        (item) => item.type === "quote"
-                                    )}
-                                />
+
+                                {company.website && (
+                                    <div className="flex items-start gap-3">
+                                        <Globe className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                        <div className="flex-1">
+                                            <p className="font-medium text-sm">
+                                                Website
+                                            </p>
+                                            <div className="flex items-center gap-2">
+                                                <a
+                                                    href={`https://${company.website}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
+                                                >
+                                                    {company.website}
+                                                    <ExternalLink className="h-3.5 w-3.5 ml-1" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
+
                         <Card>
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <div className="space-y-1">
-                                    <CardTitle>Active Jobs</CardTitle>
-                                    <CardDescription>
-                                        Current jobs in progress
-                                    </CardDescription>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="gap-1"
-                                    onClick={() => setActiveTab("jobs")}
-                                >
-                                    View all{" "}
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
+                            <CardHeader>
+                                <CardTitle>Address</CardTitle>
+                                <CardDescription>
+                                    Physical location of this company
+                                </CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                <CompanyActiveTable
-                                    activeItems={companyActiveWork.filter(
-                                        (item) => item.type === "job"
-                                    )}
-                                />
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <div className="space-y-1">
-                                    <CardTitle>Active Invoices</CardTitle>
-                                    <CardDescription>
-                                        Current invoices in progress
-                                    </CardDescription>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-start gap-3">
+                                    <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                    <div>
+                                        <p className="font-medium text-sm">
+                                            Address
+                                        </p>
+                                        <div className="text-muted-foreground space-y-1">
+                                            <p>{company.street1}</p>
+                                            {company.street2 && (
+                                                <p>{company.street2}</p>
+                                            )}
+                                            <p>
+                                                {company.city}, {company.state}{" "}
+                                                {company.zipCode}
+                                            </p>
+                                            <p>{company.country}</p>
+                                        </div>
+                                        <div className="mt-3">
+                                            <a
+                                                href={`https://maps.google.com/?q=${encodeURIComponent(
+                                                    getFullAddress()
+                                                )}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center text-sm text-primary hover:text-primary/80"
+                                            >
+                                                View on Google Maps
+                                                <ExternalLink className="h-3.5 w-3.5 ml-1" />
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="gap-1"
-                                    onClick={() => setActiveTab("invoices")}
-                                >
-                                    View all{" "}
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
-                            </CardHeader>
-                            <CardContent>
-                                <CompanyActiveTable
-                                    activeItems={companyActiveWork.filter(
-                                        (item) => item.type === "invoice"
-                                    )}
-                                />
                             </CardContent>
                         </Card>
                     </div>
-                </TabsContent>
 
-                <TabsContent value="quotes">
                     <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div className="space-y-1">
-                                <CardTitle>All Quotes</CardTitle>
-                                <CardDescription>
-                                    Manage company quotes
-                                </CardDescription>
-                            </div>
-                            {/* <Button>Create Quote</Button> */}
+                        <CardHeader>
+                            <CardTitle>Business Hours</CardTitle>
+                            <CardDescription>
+                                Operating hours for this company
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <CompanyQuotesTable companyId={company.id} />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                {sortedBusinessHours
+                                    .slice(
+                                        0,
+                                        showAllHours
+                                            ? sortedBusinessHours.length
+                                            : 3
+                                    )
+                                    .map((hour) => (
+                                        <div
+                                            key={hour.day}
+                                            className="flex justify-between items-center p-3 rounded-lg border"
+                                        >
+                                            <div className="font-medium">
+                                                {hour.day}
+                                            </div>
+                                            {hour.isOpen ? (
+                                                <div className="text-sm">
+                                                    {formatTime(hour.openTime)}{" "}
+                                                    -{" "}
+                                                    {formatTime(hour.closeTime)}
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm text-muted-foreground">
+                                                    Closed
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                            </div>
+
+                            {sortedBusinessHours.length > 3 && (
+                                <Button
+                                    variant="ghost"
+                                    className="mt-4 w-full"
+                                    onClick={() =>
+                                        setShowAllHours(!showAllHours)
+                                    }
+                                >
+                                    {showAllHours ? (
+                                        <>
+                                            <ChevronUp className="h-4 w-4 mr-2" />
+                                            Show Less
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ChevronDown className="h-4 w-4 mr-2" />
+                                            Show All Hours
+                                        </>
+                                    )}
+                                </Button>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="jobs">
+                <TabsContent value="payments">
                     <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div className="space-y-1">
-                                <CardTitle>All Jobs</CardTitle>
-                                <CardDescription>
-                                    Manage company jobs
-                                </CardDescription>
-                            </div>
-                            {/* <Button>Create Job</Button> */}
+                        <CardHeader>
+                            <CardTitle>Payment History</CardTitle>
+                            <CardDescription>
+                                Recent payment records
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <CompanyJobsTable companyId={company.id} />
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="invoices">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div className="space-y-1">
-                                <CardTitle>All Invoices</CardTitle>
-                                <CardDescription>
-                                    Manage company invoices
-                                </CardDescription>
-                            </div>
-                            {/* <Button>Create Invoice</Button> */}
-                        </CardHeader>
-                        <CardContent>
-                            <CompanyInvoicesTable companyId={company.id} />
+                            <CompanyPaymentHistory companyId={company.id} />
                         </CardContent>
                     </Card>
                 </TabsContent>

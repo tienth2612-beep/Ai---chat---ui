@@ -81,12 +81,12 @@ export function useCompany() {
                     return response.items;
                 } else {
                     setError("Failed to fetch users from company");
-                    return { companies: [], total: 0 };
+                    return [];
                 }
             } catch (error) {
                 console.error("Get users from company error:", error);
                 setError("An unexpected error occurred. Please try again.");
-                return null;
+                return [];
             } finally {
                 setIsLoading(false);
             }
