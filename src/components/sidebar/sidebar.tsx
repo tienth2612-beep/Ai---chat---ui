@@ -116,10 +116,15 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
             href: "/settings",
             icon: Settings,
             submenu: [
+                // {
+                //     title: "Industries",
+                //     href: "/settings/industries",
+                //     icon: Building2,
+                // },
                 {
-                    title: "Industries",
-                    href: "/settings/industries",
-                    icon: Building2,
+                    title: "Welcome Questions",
+                    href: "/settings/welcome-questions",
+                    icon: HelpCircle,
                 },
             ],
         },

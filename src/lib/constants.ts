@@ -37,6 +37,9 @@ export const API_URL = {
     COUNTRIES: "Common/countries",
     TIMEZONES: "Common/timezones",
 
+    //welcome question
+    WELCOME_QUESTION: "welcomeQuestion",
+
     //client
     CLIENT: "Client",
 
@@ -61,4 +64,14 @@ export const API_URL = {
 
     //tax
     TAX: "Taxes",
+};
+
+export const WELCOME_QUESTION_TYPE = {
+    SINGLE_CHOICE: 0,
+    MULTIPLE_CHOICE: 1,
+};
+
+export const COMMON_STATUS = {
+    ACTIVE: 1,
+    INACTIVE: 0,
 };
