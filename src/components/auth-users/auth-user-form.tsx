@@ -99,7 +99,7 @@ export function AuthUserForm({ userId }: AuthUserFormProps) {
                 await inviteAuthUser({ email: values.email });
                 toast.success("Invitation sent successfully.");
             }
-            router.push("/auth-users");
+            router.push("/settings/auth-users");
         } catch (error) {
             toast.error("Something went wrong. Please try again.");
         }

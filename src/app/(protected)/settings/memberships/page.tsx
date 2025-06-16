@@ -13,7 +13,7 @@ export default function CompaniesPage() {
                     Membership
                 </h2>
                 <div className="flex items-center space-x-2">
-                    <Link href="/memberships/new">
+                    <Link href="/settings/memberships/new">
                         <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Add Membership

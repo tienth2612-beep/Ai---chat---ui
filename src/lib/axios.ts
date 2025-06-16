@@ -11,6 +11,16 @@ const api = axios.create({
     },
 });
 
+export const apiFormBuilder = axios.create({
+    baseURL:
+        process.env.NEXT_PUBLIC_API_URL ||
+        "https://hitradies-backoffice-api-9zcxn.ondigitalocean.app/api/",
+    withCredentials: true,
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+});
+
 // Request interceptor
 // api.interceptors.request.use(
 //     (config) => {

@@ -46,15 +46,15 @@ export function RoleDetail({ id }: RoleDetailProps) {
     }, [id, getRole, getRoleAssignments]);
 
     const handleBack = () => {
-        router.push("/rbac/roles");
+        router.push("/user-management/rbac/roles");
     };
 
     const handleEdit = () => {
-        router.push(`/rbac/roles/${id}/edit`);
+        router.push(`/user-management/rbac/roles/${id}/edit`);
     };
 
     const handleAddPermissions = () => {
-        router.push(`/rbac/roles/${id}/add-permissions`);
+        router.push(`/user-management/rbac/roles/${id}/add-permissions`);
     };
     const handleTogglePermission = async (
         permissionId: number,

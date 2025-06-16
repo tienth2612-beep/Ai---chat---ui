@@ -75,15 +75,15 @@ export function MembershipDetail({
     const [roleToRemove, setRoleToRemove] = useState<number | null>(null);
 
     const handleEditMembership = () => {
-        router.push(`/memberships/${id}/edit`);
+        router.push(`/settings/memberships/${id}/edit`);
     };
 
     const handleAddPermissions = () => {
-        router.push(`/memberships/${id}/permissions`);
+        router.push(`/settings/memberships/${id}/permissions`);
     };
 
     const handleAddRoles = () => {
-        router.push(`/memberships/${id}/roles`);
+        router.push(`/settings/memberships/${id}/roles`);
     };
 
     const permissionColumns = [

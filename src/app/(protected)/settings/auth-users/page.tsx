@@ -13,7 +13,7 @@ export default function AuthUsersPage() {
                     Auth Users
                 </h2>
                 <div className="flex items-center space-x-2">
-                    <Link href="/auth-users/new">
+                    <Link href="/settings/auth-users/new">
                         <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Invite User

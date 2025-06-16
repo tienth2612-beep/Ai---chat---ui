@@ -60,6 +60,10 @@ export interface DetailCompanyResponse {
     status: number;
     industries: string | null;
     totalMember: string | null;
+    updateAt: string;
+    updateBy: number;
+    createAt: string;
+    createBy: number;
 }
 
 export interface CompanyMetricsResponse {
@@ -91,5 +95,13 @@ export interface CompanyActiveWorkResponse {
     zip: string | null;
     country: string | null;
     title: string | null;
+}
+
+export interface CompanyChangeRequest {
+    id: number;
+    type: string;
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    createdAt: string;
+    changes: Record<string, any>;
 }
 //#endregion

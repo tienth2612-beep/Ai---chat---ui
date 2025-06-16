@@ -40,30 +40,9 @@ export const API_URL = {
     //welcome question
     WELCOME_QUESTION: "welcomeQuestion",
 
-    //client
-    CLIENT: "Client",
-
-    //quote
-    QUOTE: "Quote",
-    EXTERNAL: "external",
-
-    //job
-    JOB: "Job",
-
-    //Product/Service item
-    COMPANY_SERVICE: "Service",
-
-    //invoice
-    INVOICE: "Invoices",
-
-    //team member
-    TEAM_MEMBER: "TeamMembers",
-
-    //payment method
-    PAYMENT_METHOD: "PaymentMethods",
-
-    //tax
-    TAX: "Taxes",
+    //excel
+    UPLOAD_TEMPLATE: "setting/upload-template-excel",
+    GET_TEMPLATES: "setting/templates-excel",
 };
 
 export const WELCOME_QUESTION_TYPE = {
@@ -73,5 +52,31 @@ export const WELCOME_QUESTION_TYPE = {
 
 export const COMMON_STATUS = {
     ACTIVE: 1,
-    INACTIVE: 0,
+    WAITING_APPROVE: 0,
+    INACTIVE: -1,
+};
+
+export const EXCEL_TARGET = {
+    NONE: 0,
+    CLIENT: 1,
+    QUOTE: 2,
+    JOB: 3,
+    INVOICE: 4,
+    USER: 5,
+};
+export type ExcelTarget = (typeof EXCEL_TARGET)[keyof typeof EXCEL_TARGET];
+export const EXCEL_TARGET_LABELS: Record<ExcelTarget, string> = {
+    [EXCEL_TARGET.NONE]: "None",
+    [EXCEL_TARGET.CLIENT]: "Client",
+    [EXCEL_TARGET.QUOTE]: "Quote",
+    [EXCEL_TARGET.JOB]: "Job",
+    [EXCEL_TARGET.INVOICE]: "Invoice",
+    [EXCEL_TARGET.USER]: "User",
+};
+export const getExcelTargetOptions = () => {
+    return Object.entries(EXCEL_TARGET).map(([key, value]) => ({
+        value,
+        label: EXCEL_TARGET_LABELS[value],
+        key,
+    }));
 };

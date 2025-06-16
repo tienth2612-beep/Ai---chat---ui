@@ -34,11 +34,11 @@ export function PermissionDetail({ id }: PermissionDetailProps) {
     }, [id, getPermission]);
 
     const handleBack = () => {
-        router.push("/rbac/permissions");
+        router.push("/user-management/rbac/permissions");
     };
 
     const handleEdit = () => {
-        router.push(`/rbac/permissions/${id}/edit`);
+        router.push(`/user-management/rbac/permissions/${id}/edit`);
     };
 
     if (isLoading) {

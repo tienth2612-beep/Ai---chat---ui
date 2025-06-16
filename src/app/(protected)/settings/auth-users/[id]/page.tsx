@@ -46,7 +46,9 @@ export default function AuthUserDetailsPage({
                     </p>
                 </div>
                 <Button
-                    onClick={() => router.push(`/auth-users/${params.id}/edit`)}
+                    onClick={() =>
+                        router.push(`/settings/auth-users/${params.id}/edit`)
+                    }
                 >
                     Edit User
                 </Button>

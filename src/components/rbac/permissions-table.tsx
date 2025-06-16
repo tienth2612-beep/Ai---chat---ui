@@ -29,11 +29,11 @@ const ActionsCell = ({ row }: { row: any }) => {
     const { updatePermission, getPermissions } = useRbac();
 
     const handleView = () => {
-        router.push(`/rbac/permissions/${permission.id}`);
+        router.push(`/user-management/rbac/permissions/${permission.id}`);
     };
 
     const handleEdit = () => {
-        router.push(`/rbac/permissions/${permission.id}/edit`);
+        router.push(`/user-management/rbac/permissions/${permission.id}/edit`);
     };
 
     const handleDelete = async () => {
@@ -110,14 +110,14 @@ const usePermissionHandlers = () => {
 
     const handleView = useCallback(
         (id: string) => {
-            router.push(`/rbac/permissions/${id}`);
+            router.push(`/user-management/rbac/permissions/${id}`);
         },
         [router]
     );
 
     const handleEdit = useCallback(
         (id: string) => {
-            router.push(`/rbac/permissions/${id}/edit`);
+            router.push(`/user-management/rbac/permissions/${id}/edit`);
         },
         [router]
     );
@@ -209,7 +209,7 @@ export function PermissionsTable() {
     }, [getPermissions]);
 
     const handleCreatePermission = () => {
-        router.push("/rbac/permissions/new");
+        router.push("/user-management/rbac/permissions/new");
     };
 
     // Define the columns for the data table

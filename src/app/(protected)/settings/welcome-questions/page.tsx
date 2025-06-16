@@ -12,6 +12,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { WelcomeQuestionForm } from "@/components/welcome-questions/welcome-question-form";
+import { PlusCircle } from "lucide-react";
 
 export default function WelcomeQuestionsPage() {
     return (
@@ -22,7 +23,10 @@ export default function WelcomeQuestionsPage() {
                 </h2>
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button>Add Question</Button>
+                        <Button>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Add Question
+                        </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>

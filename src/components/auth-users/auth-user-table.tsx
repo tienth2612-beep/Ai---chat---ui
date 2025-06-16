@@ -164,7 +164,7 @@ export function AuthUserTable() {
                                             <DropdownMenuItem
                                                 onClick={() =>
                                                     router.push(
-                                                        `/auth-users/${user.id}`
+                                                        `/settings/auth-users/${user.id}`
                                                     )
                                                 }
                                             >
@@ -173,7 +173,7 @@ export function AuthUserTable() {
                                             <DropdownMenuItem
                                                 onClick={() =>
                                                     router.push(
-                                                        `/auth-users/${user.id}/edit`
+                                                        `/settings/auth-users/${user.id}/edit`
                                                     )
                                                 }
                                             >

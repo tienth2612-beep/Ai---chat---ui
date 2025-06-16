@@ -30,6 +30,7 @@ import {
     ShieldCheck,
     Lock,
     ChevronDown,
+    FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -79,55 +80,126 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
             icon: LayoutDashboard,
         },
         {
-            title: "Auth Users",
-            href: "/auth-users",
-            icon: Users,
-        },
-        {
-            title: "RBAC",
-            href: "/rbac",
-            icon: ShieldCheck,
+            title: "User Management",
+            href: "/user-management",
+            icon: User,
             submenu: [
+                // {
+                //     title: "RBAC Management",
+                //     href: "/rbac",
+                //     icon: ShieldCheck,
+                //     submenu: [
+                //         {
+                //             title: "Roles",
+                //             href: "/rbac/roles",
+                //             icon: ShieldCheck,
+                //         },
+                //         {
+                //             title: "Permissions",
+                //             href: "/rbac/permissions",
+                //             icon: Lock,
+                //         },
+                //     ],
+                // },
                 {
                     title: "Roles",
-                    href: "/rbac/roles",
+                    href: "/user-management/rbac/roles",
                     icon: ShieldCheck,
                 },
                 {
                     title: "Permissions",
-                    href: "/rbac/permissions",
+                    href: "/user-management/rbac/permissions",
                     icon: Lock,
+                },
+                {
+                    title: "Companies Management",
+                    href: "/user-management/companies",
+                    icon: Building2,
                 },
             ],
         },
         {
-            title: "Companies",
-            href: "/companies",
-            icon: Building2,
-        },
-
-        {
-            title: "Memberships",
-            href: "/memberships",
-            icon: CreditCard,
-        },
-        {
-            title: "Settings",
+            title: "HiTradies Settings",
             href: "/settings",
-            icon: Settings,
+            icon: Building2,
             submenu: [
-                // {
-                //     title: "Industries",
-                //     href: "/settings/industries",
-                //     icon: Building2,
-                // },
                 {
-                    title: "Welcome Questions",
+                    title: "Auth Users",
+                    href: "/settings/auth-users",
+                    icon: Users,
+                },
+                {
+                    title: "Memberships",
+                    href: "/settings/memberships",
+                    icon: CreditCard,
+                },
+                {
+                    title: "Common Questions",
                     href: "/settings/welcome-questions",
                     icon: HelpCircle,
                 },
+                {
+                    title: "Excel Templates",
+                    href: "/settings/excel-templates",
+                    icon: FileSpreadsheet,
+                },
             ],
         },
+        // {
+        //     title: "Auth Users",
+        //     href: "/auth-users",
+        //     icon: Users,
+        // },
+        // {
+        //     title: "RBAC",
+        //     href: "/rbac",
+        //     icon: ShieldCheck,
+        //     submenu: [
+        //         {
+        //             title: "Roles",
+        //             href: "/rbac/roles",
+        //             icon: ShieldCheck,
+        //         },
+        //         {
+        //             title: "Permissions",
+        //             href: "/rbac/permissions",
+        //             icon: Lock,
+        //         },
+        //     ],
+        // },
+        // {
+        //     title: "Companies",
+        //     href: "/companies",
+        //     icon: Building2,
+        // },
+
+        // {
+        //     title: "Memberships",
+        //     href: "/memberships",
+        //     icon: CreditCard,
+        // },
+        // {
+        //     title: "Settings",
+        //     href: "/settings",
+        //     icon: Settings,
+        //     submenu: [
+        //         // {
+        //         //     title: "Industries",
+        //         //     href: "/settings/industries",
+        //         //     icon: Building2,
+        //         // },
+        //         {
+        //             title: "Welcome Questions",
+        //             href: "/settings/welcome-questions",
+        //             icon: HelpCircle,
+        //         },
+        //         {
+        //             title: "Excel Templates",
+        //             href: "/settings/excel-templates",
+        //             icon: FileSpreadsheet,
+        //         },
+        //     ],
+        // },
     ];
 
     return (
@@ -185,7 +257,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                     {/* Navigation */}
                     <div className="sidebar-scrollbar flex-1 overflow-y-auto py-6">
                         <nav className="space-y-1 px-3">
-                            {navItems.map((item) => {
+                            {navItems.map((item, index) => {
                                 const isActive =
                                     pathname === item.href ||
                                     (item.href !== "/" &&
@@ -196,10 +268,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                 // Render submenu items if they exist
                                 if (item.submenu && !collapsed) {
                                     return (
-                                        <div
-                                            key={item.href}
-                                            className="space-y-1"
-                                        >
+                                        <div key={index} className="space-y-1">
                                             <button
                                                 onClick={() =>
                                                     toggleSubmenu(item.href)
@@ -294,7 +363,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                     );
                                 }
                                 return (
-                                    <Tooltip key={item.href}>
+                                    <Tooltip key={index}>
                                         <TooltipTrigger asChild>
                                             <button
                                                 onClick={() =>

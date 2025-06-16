@@ -46,7 +46,9 @@ export default function RbacPage() {
                     </CardContent>
                     <CardFooter>
                         <Button asChild className="w-full">
-                            <Link href="/rbac/roles">Manage Roles</Link>
+                            <Link href="/user-management/rbac/roles">
+                                Manage Roles
+                            </Link>
                         </Button>
                     </CardFooter>
                 </Card>
@@ -67,7 +69,7 @@ export default function RbacPage() {
                     </CardContent>
                     <CardFooter>
                         <Button asChild className="w-full">
-                            <Link href="/rbac/permissions">
+                            <Link href="/user-management/rbac/permissions">
                                 Manage Permissions
                             </Link>
                         </Button>
