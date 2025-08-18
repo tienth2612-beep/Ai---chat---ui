@@ -1,5 +1,4 @@
-import { getCurrentUser } from "@/lib/auth";
-import type { Metadata } from "next";
+"use client";
 import {
     Card,
     CardContent,
@@ -8,13 +7,8 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
-export const metadata: Metadata = {
-    title: "Dashboard",
-    description: "Hi Tradies Management Dashboard",
-};
-
-export default async function DashboardPage() {
-    const User = await getCurrentUser();
+export default function DashboardPage() {
+    // Add your client-side logic here
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="flex items-center justify-between space-y-2">
@@ -64,9 +58,9 @@ export default async function DashboardPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
                     <CardHeader>
-                        <CardTitle>Welcome, {User?.name}</CardTitle>
+                        <CardTitle>Dashboard</CardTitle>
                         <CardDescription>
-                            This is your management dashboard for Hi Tradies
+                            Hi Tradies Management Dashboard
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

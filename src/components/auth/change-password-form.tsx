@@ -25,7 +25,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { usePassword } from "@/hooks/use-password";
 
@@ -55,12 +55,9 @@ export function ChangePasswordForm() {
         changePassword,
         isLoading,
         error: passwordError,
-        success: passwordSuccess,
     } = usePassword();
     const [step, setStep] = useState<"request" | "change">("request");
     const [isResending, setIsResending] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -74,22 +71,17 @@ export function ChangePasswordForm() {
 
     async function handleResendOTP() {
         setIsResending(true);
-        setError(null);
 
         try {
             const result = await resendResetOTP();
 
             if (result) {
-                setSuccess(
-                    passwordSuccess ||
-                        "New verification code sent to your email"
-                );
                 toast.success("New verification code sent", {
                     description:
                         "Please check your email for the new verification code",
                 });
+                setStep("change");
             } else {
-                setError(passwordError || "Failed to resend verification code");
                 toast.error("Error", {
                     description:
                         passwordError || "Failed to resend verification code",
@@ -97,7 +89,6 @@ export function ChangePasswordForm() {
             }
         } catch (error) {
             console.error("Resend OTP error:", error);
-            setError("An unexpected error occurred. Please try again.");
             toast.error("Something went wrong", {
                 description: "Please try again later",
             });
@@ -107,9 +98,6 @@ export function ChangePasswordForm() {
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        setError(null);
-        setSuccess(null);
-
         try {
             const data: UserAuth.ChangePasswordRequest = {
                 NewPassword: values.newPassword,
@@ -121,19 +109,16 @@ export function ChangePasswordForm() {
             if (result) {
                 form.reset();
                 setStep("request");
-                setSuccess("Your password has been changed successfully");
                 toast.success("Password changed", {
                     description: "Your password has been changed successfully",
                 });
             } else {
-                setError(passwordError || "Failed to change password");
                 toast.error("Error", {
                     description: passwordError || "Failed to change password",
                 });
             }
         } catch (error) {
             console.error("Change password error:", error);
-            setError("An unexpected error occurred. Please try again.");
             toast.error("Something went wrong", {
                 description: "Please try again later",
             });
@@ -151,7 +136,7 @@ export function ChangePasswordForm() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {error && (
+                    {/* {error && (
                         <Alert variant="destructive" className="mb-4">
                             <AlertTitle>Error</AlertTitle>
                             <AlertDescription>{error}</AlertDescription>
@@ -162,7 +147,7 @@ export function ChangePasswordForm() {
                             <AlertTitle>Success</AlertTitle>
                             <AlertDescription>{success}</AlertDescription>
                         </Alert>
-                    )}
+                    )} */}
                     <p className="text-sm text-muted-foreground mb-4">
                         Click the button below to receive a verification code
                         via email. You wlll need this code to complete the
@@ -198,7 +183,7 @@ export function ChangePasswordForm() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {error && (
+                {/* {error && (
                     <Alert variant="destructive" className="mb-4">
                         <AlertTitle>Error</AlertTitle>
                         <AlertDescription>{error}</AlertDescription>
@@ -209,7 +194,7 @@ export function ChangePasswordForm() {
                         <AlertTitle>Success</AlertTitle>
                         <AlertDescription>{success}</AlertDescription>
                     </Alert>
-                )}
+                )} */}
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}

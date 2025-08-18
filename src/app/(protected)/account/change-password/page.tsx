@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
+"use client";
 import { ChangePasswordForm } from "@/components/auth/change-password-form";
 
-export const metadata: Metadata = {
-    title: "Change Password",
-    description: "Change your account password",
-};
-
 export default function ChangePasswordPage() {
+    // Add your client-side logic here
     return (
         <div className="mx-auto max-w-md space-y-6">
             <div>

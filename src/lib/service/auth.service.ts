@@ -20,6 +20,19 @@ export const authService = {
         }
     },
 
+    googleLogin: async (
+        token: string
+    ): Promise<BaseResultWithData<UserAuth.UserAuthResponse>> => {
+        try {
+            return await api.post(API_URL.AUTH_GOOGLE_LOGIN, { token });
+        } catch (error: any) {
+            if (error) {
+                return error;
+            }
+            throw error;
+        }
+    },
+
     logout: async (): Promise<BaseResult> => {
         try {
             return await api.post(API_URL.AUTH_LOGOUT);

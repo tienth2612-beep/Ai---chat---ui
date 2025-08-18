@@ -20,16 +20,13 @@ function DropdownMenuPortal({
   )
 }
 
-function DropdownMenuTrigger({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
-  return (
-    <DropdownMenuPrimitive.Trigger
-      data-slot="dropdown-menu-trigger"
-      {...props}
-    />
-  )
-}
+const DropdownMenuTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>
+>((props, ref) => (
+  <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" ref={ref} {...props} />
+));
+DropdownMenuTrigger.displayName = "DropdownMenuTrigger";
 
 function DropdownMenuContent({
   className,

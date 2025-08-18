@@ -1,25 +1,24 @@
-import type { Metadata } from "next";
+"use client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { RegisterForm } from "@/components/auth/register-form";
-import { getSession } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 
-export const metadata: Metadata = {
-    title: "Register",
-    description: "Create a new account",
-};
+export default function RegisterPage() {
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
 
-export default async function RegisterPage() {
-    // Get the session
-    const session = await getSession();
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.push("/dashboard");
+        }
+    }, [user, isLoading, router]);
 
-    // If we have a session, redirect to dashboard
-    if (session) {
-        return redirect("/dashboard");
+    if (isLoading) {
+        return <div>Loading...</div>;
     }
 
-    // If no session, show the register page
     return (
         <div className="mx-auto flex w-full max-w-[350px] flex-col justify-center space-y-6">
             <div className="flex flex-col space-y-2 text-center">

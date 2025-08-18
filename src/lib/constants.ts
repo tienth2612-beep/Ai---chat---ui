@@ -8,11 +8,30 @@ export const API_URL = {
     AUTH_FORGOT_PASSWORD: "auth/forgot-password",
     AUTH_CHANGE_PASSWORD: "auth/change-password",
     AUTH_GET_USER: "auth",
+    AUTH_GOOGLE_LOGIN: "auth/google-login",
 
     //USer
     USER: "user",
+    AUTH_USER: "authUser",
+
     //company
     COMPANY: "Company",
+
+    //membership
+    MEMBERSHIP: "package",
+    SUBSCRIPTION_HISTORY: "package/subscription-history",
+
+    //rbac
+    PERMISSIONS: "rbac/permission",
+    ROLES: "rbac/role",
+    PACKAGE_ROLES: "rbac/package",
+
+    //payment
+    PAYMENT: "Payment",
+    PAYMENT_HISTORY: "payment-history",
+
+    //industry
+    INDUSTRY: "industries",
 
     //common
     COUNTRIES: "Common/countries",

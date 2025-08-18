@@ -1,19 +1,21 @@
-import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthCheck } from "@/hooks/use-auth-check";
 
-export default async function HomePage() {
-    // Check if the user is authenticated
-    const session = await getSession();
+export default function HomePage() {
+    const { isLoading, user } = useAuthCheck();
+    const router = useRouter();
 
-    // Redirect to the appropriate page
-    if (session) {
-        // If authenticated, redirect to dashboard
-        redirect("/dashboard");
-    } else {
-        // If not authenticated, redirect to login
-        redirect("/login");
-    }
+    useEffect(() => {
+        if (!isLoading) {
+            if (user) {
+                router.push("/dashboard");
+            } else {
+                router.push("/login");
+            }
+        }
+    }, [user, isLoading, router]);
 
-    // This return is never reached but is needed for TypeScript
     return null;
 }

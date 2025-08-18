@@ -10,6 +10,14 @@ export interface ApiError {
     errors?: Record<string, string[]>;
 }
 
+export interface FilterRequest {
+    page: number;
+    pageSize: number;
+    search?: string;
+    fromDate?: string;
+    toDate?: string;
+}
+
 export interface BaseResultWithData<T> {
     isSuccess: boolean;
     code: number;
@@ -29,4 +37,16 @@ export interface PageResult<T> {
     totalCount: number;
     pageNumber: number;
     pageSize: number;
+}
+// For service errors
+export interface ServiceError extends Error {
+    response?: {
+        data: ApiError;
+        status: number;
+    };
+}
+export interface ApiError {
+    message: string;
+    status: number;
+    errors?: Record<string, string[]>;
 }

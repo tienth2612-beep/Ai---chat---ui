@@ -1,6 +1,8 @@
+"use client";
+
 import { UserTable } from "@/components/users/user-table";
 
-export default async function UsersPage() {
+export default function UsersPage() {
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="flex items-center justify-between space-y-2">

@@ -1,11 +1,7 @@
+import { FilterRequest } from "./api";
+
 //#region "Request"
-export interface GetAllCompanyRequest {
-    fromDate: string;
-    toDate: string;
-    page: number;
-    pageSize: number;
-    search: string | null;
-}
+export interface GetAllCompanyRequest extends FilterRequest {}
 
 export interface GetCompanyRequest {
     userId: number;
@@ -24,18 +20,18 @@ export interface Company {
 }
 
 export interface CompanyResponse {
-    Id: number;
-    Name?: string;
-    Description?: string;
-    Logo?: string;
-    Phone?: string;
-    Email?: string;
-    Website?: string;
-    Street1?: string;
-    Street2?: string;
-    City?: string;
-    State?: string;
-    ZipCode?: string;
+    id: number;
+    name?: string;
+    description?: string;
+    logo?: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+    street1?: string;
+    street2?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
 }
 
 export interface DetailCompanyResponse {
@@ -62,5 +58,38 @@ export interface DetailCompanyResponse {
     timeFormat: string | null;
     firstDayOfWeek: number;
     status: number;
+    industries: string | null;
+    totalMember: string | null;
+}
+
+export interface CompanyMetricsResponse {
+    companyId: number;
+    clientId: number;
+    invoiceCount: number;
+    invoiceTotal: number;
+    invoicePaid: number;
+    quoteCount: number;
+    quoteTotal: number;
+    jobCount: number;
+    jobTotal: number;
+}
+
+export interface CompanyActiveWorkResponse {
+    id: number;
+    no: string | null;
+    clientId: number;
+    type: string | null;
+    dueDate: string;
+    status: number;
+    createAt: string;
+    updateAt: string;
+    total: number;
+    street1: string | null;
+    street2: string | null;
+    city: string | null;
+    state: string | null;
+    zip: string | null;
+    country: string | null;
+    title: string | null;
 }
 //#endregion
