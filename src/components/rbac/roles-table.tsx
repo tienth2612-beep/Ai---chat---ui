@@ -29,15 +29,15 @@ export function RolesTable() {
     }, [getRoles]);
     console.log(roles);
     const handleCreateRole = () => {
-        router.push("/rbac/roles/new");
+        router.push("/user-management/rbac/roles/new");
     };
 
     const handleViewRole = (id: string) => {
-        router.push(`/rbac/roles/${id}`);
+        router.push(`/user-management/rbac/roles/${id}`);
     };
 
     const handleEditRole = (id: string) => {
-        router.push(`/rbac/roles/${id}/edit`);
+        router.push(`/user-management/rbac/roles/${id}/edit`);
     };
 
     const handleDeleteRole = async (id: string) => {

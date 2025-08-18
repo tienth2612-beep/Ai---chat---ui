@@ -85,7 +85,7 @@ export function PermissionForm({
                     toast.success("Permission updated", {
                         description: "Permission has been updated successfully",
                     });
-                    router.push("/rbac/permissions");
+                    router.push("/user-management/rbac/permissions");
                 }
             } else {
                 const newPermission = await createPermission(values);
@@ -94,7 +94,7 @@ export function PermissionForm({
                         description:
                             "New permission has been created successfully",
                     });
-                    router.push("/rbac/permissions");
+                    router.push("/user-management/rbac/permissions");
                 }
             }
         } catch (error) {
@@ -109,7 +109,7 @@ export function PermissionForm({
             <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push("/rbac/permissions")}
+                onClick={() => router.push("/user-management/rbac/permissions")}
             >
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Permissions
             </Button>
@@ -188,7 +188,9 @@ export function PermissionForm({
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => router.push("/rbac/permissions")}
+                            onClick={() =>
+                                router.push("/user-management/rbac/permissions")
+                            }
                         >
                             Cancel
                         </Button>

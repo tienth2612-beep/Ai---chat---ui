@@ -83,4 +83,27 @@ export const companyService = {
     ): Promise<PageResult<InvoiceModel.InvoicesResponse>> => {
         return api.get(`${API_URL.COMPANY}/${id}/invoices`, { params: data });
     },
+    GetCompanyRequestsUpdate: async (
+        id: number
+    ): Promise<PageResult<CompanyModel.DetailCompanyResponse>> => {
+        return api.get(`${API_URL.COMPANY}/${id}/request-update`);
+    },
+    GetCompanyRequestUpdateById: async (
+        companyId: number,
+        requestId: number
+    ): Promise<BaseResultWithData<CompanyModel.DetailCompanyResponse>> => {
+        return api.get(
+            `${API_URL.COMPANY}/${companyId}/request-update/${requestId}`
+        );
+    },
+    UpdateCompanyRequestUpdate: async (
+        companyId: number,
+        requestId: number,
+        data: Partial<CompanyModel.Company>
+    ): Promise<BaseResultWithData<CompanyModel.DetailCompanyResponse>> => {
+        return api.post(
+            `${API_URL.COMPANY}/${companyId}/request-update/${requestId}`,
+            data
+        );
+    },
 };

@@ -104,7 +104,7 @@ export function MembershipForm({
                     );
                 }
             }
-            router.push("/memberships");
+            router.push("/settings/memberships");
             router.refresh();
         } catch (error) {
             toast.error("Something went wrong. Please try again.");
@@ -112,12 +112,12 @@ export function MembershipForm({
     }
     const handleManagePermissions = () => {
         if (membership) {
-            router.push(`/memberships/${membership.id}/permissions`);
+            router.push(`/settings/memberships/${membership.id}/permissions`);
         }
     };
     const handleManageRoles = () => {
         if (membership) {
-            router.push(`/memberships/${membership.id}/roles`);
+            router.push(`/settings/memberships/${membership.id}/roles`);
         }
     };
     return (
@@ -181,7 +181,7 @@ export function MembershipForm({
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() => router.push("/memberships")}
+                        onClick={() => router.push("/settings/memberships")}
                     >
                         Cancel
                     </Button>

@@ -79,7 +79,7 @@ export function RolePermissionsForm({ roleId }: RolePermissionsFormProps) {
 
             if (updatedRole) {
                 toast.success("Permissions updated");
-                router.push(`/rbac/roles/${roleId}`);
+                router.push(`/user-management/rbac/roles/${roleId}`);
             }
         } catch (error) {
             toast.error("Error updating permissions");
@@ -107,7 +107,9 @@ export function RolePermissionsForm({ roleId }: RolePermissionsFormProps) {
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() =>
+                        router.push(`/user-management/rbac/roles/${roleId}`)
+                    }
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Role
                 </Button>
@@ -162,7 +164,9 @@ export function RolePermissionsForm({ roleId }: RolePermissionsFormProps) {
                 </Button>
                 <Button
                     variant="outline"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() =>
+                        router.push(`/user-management/rbac/roles/${roleId}`)
+                    }
                 >
                     Cancel
                 </Button>

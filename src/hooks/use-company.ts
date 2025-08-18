@@ -35,6 +35,13 @@ export function useCompany() {
         InvoiceModel.InvoicesResponse[]
     >([]);
     const [totalCompanyInvoices, setTotalCompanyInvoices] = useState(0);
+    const [companyRequestsUpdate, setCompanyRequestsUpdate] = useState<
+        CompanyModel.DetailCompanyResponse[]
+    >([]);
+    const [totalCompanyRequestsUpdate, setTotalCompanyRequestsUpdate] =
+        useState(0);
+    const [companyRequestUpdate, setCompanyRequestUpdate] =
+        useState<CompanyModel.DetailCompanyResponse | null>(null);
 
     // Get users with filters
     const getCompanies = useCallback(
@@ -335,6 +342,93 @@ export function useCompany() {
         []
     );
 
+    const getCompanyRequestsUpdate = useCallback(async (id: string) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await companyService.GetCompanyRequestsUpdate(
+                Number.parseInt(id)
+            );
+
+            if (response && response.items) {
+                setCompanyRequestsUpdate(response.items);
+                setTotalCompanyRequestsUpdate(response.totalCount);
+                return response.items;
+            } else {
+                setError("Failed to fetch company requests update");
+                return null;
+            }
+        } catch (error) {
+            console.error("Get company requests update error:", error);
+            setError("An unexpected error occurred. Please try again.");
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const getCompanyRequestUpdateById = useCallback(
+        async (companyId: string, requestId: string) => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const response =
+                    await companyService.GetCompanyRequestUpdateById(
+                        Number.parseInt(companyId),
+                        Number.parseInt(requestId)
+                    );
+
+                if (response && response.isSuccess) {
+                    setCompanyRequestUpdate(response.data);
+                    return response.data;
+                } else {
+                    setError("Failed to fetch company request update");
+                    return null;
+                }
+            } catch (error) {
+                console.error("Get company request update error:", error);
+                setError("An unexpected error occurred. Please try again.");
+                return null;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        []
+    );
+
+    const updateCompanyRequestUpdate = useCallback(
+        async (
+            companyId: string,
+            requestId: string,
+            data: Partial<CompanyModel.Company>
+        ) => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const response =
+                    await companyService.UpdateCompanyRequestUpdate(
+                        Number.parseInt(companyId),
+                        Number.parseInt(requestId),
+                        data
+                    );
+
+                if (response && response.isSuccess) {
+                    return response.data;
+                } else {
+                    setError("Failed to update company request");
+                    return null;
+                }
+            } catch (error) {
+                console.error("Update company request error:", error);
+                setError("An unexpected error occurred. Please try again.");
+                return null;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        []
+    );
+
     // Helper function to format date range for API
     const formatDateRange = (dateRange: DateRange | undefined) => {
         if (!dateRange) return { startDate: undefined, endDate: undefined };
@@ -365,6 +459,9 @@ export function useCompany() {
         companyInvoices,
         totalCompanyInvoices,
         totalCompanyActiveWork,
+        companyRequestsUpdate,
+        totalCompanyRequestsUpdate,
+        companyRequestUpdate,
         getCompanies,
         getUserByCompanyId,
         formatDateRange,
@@ -374,5 +471,8 @@ export function useCompany() {
         getCompanyJobs,
         getCompanyQuotes,
         getCompanyInvoices,
+        getCompanyRequestsUpdate,
+        getCompanyRequestUpdateById,
+        updateCompanyRequestUpdate,
     };
 }

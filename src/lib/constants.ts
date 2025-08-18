@@ -37,28 +37,46 @@ export const API_URL = {
     COUNTRIES: "Common/countries",
     TIMEZONES: "Common/timezones",
 
-    //client
-    CLIENT: "Client",
+    //welcome question
+    WELCOME_QUESTION: "welcomeQuestion",
 
-    //quote
-    QUOTE: "Quote",
-    EXTERNAL: "external",
+    //excel
+    UPLOAD_TEMPLATE: "setting/upload-template-excel",
+    GET_TEMPLATES: "setting/templates-excel",
+};
 
-    //job
-    JOB: "Job",
+export const WELCOME_QUESTION_TYPE = {
+    SINGLE_CHOICE: 0,
+    MULTIPLE_CHOICE: 1,
+};
 
-    //Product/Service item
-    COMPANY_SERVICE: "Service",
+export const COMMON_STATUS = {
+    ACTIVE: 1,
+    WAITING_APPROVE: 0,
+    INACTIVE: -1,
+};
 
-    //invoice
-    INVOICE: "Invoices",
-
-    //team member
-    TEAM_MEMBER: "TeamMembers",
-
-    //payment method
-    PAYMENT_METHOD: "PaymentMethods",
-
-    //tax
-    TAX: "Taxes",
+export const EXCEL_TARGET = {
+    NONE: 0,
+    CLIENT: 1,
+    QUOTE: 2,
+    JOB: 3,
+    INVOICE: 4,
+    USER: 5,
+};
+export type ExcelTarget = (typeof EXCEL_TARGET)[keyof typeof EXCEL_TARGET];
+export const EXCEL_TARGET_LABELS: Record<ExcelTarget, string> = {
+    [EXCEL_TARGET.NONE]: "None",
+    [EXCEL_TARGET.CLIENT]: "Client",
+    [EXCEL_TARGET.QUOTE]: "Quote",
+    [EXCEL_TARGET.JOB]: "Job",
+    [EXCEL_TARGET.INVOICE]: "Invoice",
+    [EXCEL_TARGET.USER]: "User",
+};
+export const getExcelTargetOptions = () => {
+    return Object.entries(EXCEL_TARGET).map(([key, value]) => ({
+        value,
+        label: EXCEL_TARGET_LABELS[value],
+        key,
+    }));
 };

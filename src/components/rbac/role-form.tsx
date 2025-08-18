@@ -67,7 +67,7 @@ export function RoleForm({ role, isEditing = false }: RoleFormProps) {
                     toast.success("Role updated", {
                         description: "Role has been updated successfully",
                     });
-                    router.push("/rbac/roles");
+                    router.push("/user-management/rbac/roles");
                 }
             } else {
                 const newRole = await createRole({
@@ -78,7 +78,7 @@ export function RoleForm({ role, isEditing = false }: RoleFormProps) {
                     toast.success("Role created", {
                         description: "New role has been created successfully",
                     });
-                    router.push("/rbac/roles");
+                    router.push("/user-management/rbac/roles");
                 }
             }
         } catch (error) {
@@ -93,7 +93,7 @@ export function RoleForm({ role, isEditing = false }: RoleFormProps) {
             <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push("/rbac/roles")}
+                onClick={() => router.push("/user-management/rbac/roles")}
             >
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Roles
             </Button>
@@ -166,7 +166,9 @@ export function RoleForm({ role, isEditing = false }: RoleFormProps) {
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => router.push("/rbac/roles")}
+                            onClick={() =>
+                                router.push("/user-management/rbac/roles")
+                            }
                         >
                             Cancel
                         </Button>

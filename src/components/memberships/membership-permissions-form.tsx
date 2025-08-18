@@ -151,7 +151,7 @@ export function MembershipPermissionsForm({
                 toast.success(
                     "Membership permissions have been updated successfully"
                 );
-                router.push(`/memberships/${membershipId}`);
+                router.push(`/settings/memberships/${membershipId}`);
             } else {
                 throw new Error("Failed to save permissions");
             }
@@ -198,7 +198,9 @@ export function MembershipPermissionsForm({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/memberships/${membershipId}`)}
+                    onClick={() =>
+                        router.push(`/settings/memberships/${membershipId}`)
+                    }
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Membership
                 </Button>
@@ -326,7 +328,9 @@ export function MembershipPermissionsForm({
                 </Button>
                 <Button
                     variant="outline"
-                    onClick={() => router.push(`/memberships/${membershipId}`)}
+                    onClick={() =>
+                        router.push(`/settings/memberships/${membershipId}`)
+                    }
                 >
                     Cancel
                 </Button>

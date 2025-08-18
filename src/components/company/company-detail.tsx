@@ -120,7 +120,7 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
     }, [companyId, getCompanyById]);
 
     const handleBack = () => {
-        router.push("/companies");
+        router.push("/user-management/companies");
     };
 
     const getInitials = (name: string) => {
@@ -224,7 +224,16 @@ export function CompanyDetail({ companyId }: CompanyDetailProps) {
                 <Button variant="outline" onClick={handleBack}>
                     Back
                 </Button>
-                {/* <Button onClick={handleEdit}>Edit Company</Button> */}
+                <Button
+                    variant="outline"
+                    onClick={() =>
+                        router.push(
+                            `/user-management/companies/${companyId}/requests`
+                        )
+                    }
+                >
+                    View Change Requests
+                </Button>
             </div>
 
             <Card className="mb-8">

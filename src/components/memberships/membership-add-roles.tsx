@@ -108,7 +108,7 @@ export function MembershipAddRoles({
                 toast.success(
                     `${selectedRoles.length} roles have been added to this membership.`
                 );
-                router.push(`/memberships/${membershipId}`);
+                router.push(`/settings/memberships/${membershipId}`);
             }
         } catch (error) {
             toast.error(
@@ -151,7 +151,9 @@ export function MembershipAddRoles({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/memberships/${membershipId}`)}
+                    onClick={() =>
+                        router.push(`/settings/memberships/${membershipId}`)
+                    }
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Membership
                 </Button>
@@ -250,7 +252,9 @@ export function MembershipAddRoles({
                 </Button>
                 <Button
                     variant="outline"
-                    onClick={() => router.push(`/memberships/${membershipId}`)}
+                    onClick={() =>
+                        router.push(`/settings/memberships/${membershipId}`)
+                    }
                 >
                     Cancel
                 </Button>

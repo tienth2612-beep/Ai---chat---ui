@@ -116,7 +116,7 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
                 toast.success(
                     `${selectedPermissions.length} permissions have been added to this role.`
                 );
-                router.push(`/rbac/roles/${roleId}`);
+                router.push(`/user-management/rbac/roles/${roleId}`);
             }
         } catch (error) {
             toast.error(
@@ -167,7 +167,9 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() =>
+                        router.push(`/user-management/rbac/roles/${roleId}`)
+                    }
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Role
                 </Button>
@@ -264,7 +266,9 @@ export function RoleAddPermissions({ roleId }: RoleAddPermissionsProps) {
                 </Button>
                 <Button
                     variant="outline"
-                    onClick={() => router.push(`/rbac/roles/${roleId}`)}
+                    onClick={() =>
+                        router.push(`/user-management/rbac/roles/${roleId}`)
+                    }
                 >
                     Cancel
                 </Button>
