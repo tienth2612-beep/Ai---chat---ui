@@ -1,125 +1,126 @@
-// BẮT BUỘC chạy Node.js
+// BẮT BUỘC: dùng Node runtime
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import {Ollama} from "ollama";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 
 /* =========================
-   INIT OLLAMA (CHUẨN)
-========================= */
-const ollama = new Ollama({
-  host: "http://127.0.0.1:11434",
-});
-/* =========================
-   INVOICE DETECT
+   HELPER: nhận diện invoice
 ========================= */
 function isInvoiceRequest(text: string) {
-  return /invoice|hóa đơn/i.test(text);
+  const t = text.toLowerCase();
+  return t.includes("invoice") || t.includes("hóa đơn");
 }
 
 /* =========================
-   PARSE INVOICE (KHÔNG RANDOM SAI)
+   HELPER: parse invoice linh hoạt
 ========================= */
-function parseInvoice(text: string) {
-  // Người mua: bắt sau từ "cho"
-  const buyerMatch = text.match(/cho\s+(anh|chị)?\s*([A-Za-zÀ-ỹ]+)/i);
-  const buyer = buyerMatch ? buyerMatch[2] : "Khách hàng";
+function parseInvoiceFromText(text: string) {
+  // Tên người mua (nếu có)
+  const buyerMatch =
+    text.match(/anh\s+([a-zA-ZÀ-ỹ]+)/i) ||
+    text.match(/chị\s+([a-zA-ZÀ-ỹ]+)/i) ||
+    text.match(/cho\s+([a-zA-ZÀ-ỹ]+)/i);
 
-  const productMap: Record<string, string> = {
-    "máy tính": "Máy tính",
-    "laptop": "Laptop",
-    "tivi": "Tivi",
-    "tủ lạnh": "Tủ lạnh",
-    "loa": "Loa",
-    "điện thoại": "Điện thoại",
-  };
+  const buyer = buyerMatch ? buyerMatch[1] : "Khách hàng";
 
+  // Bắt sản phẩm + giá (ví dụ: tivi giá 3000)
   const itemRegex =
-    /(\d+)?\s*(máy tính|laptop|tivi|tủ lạnh|loa|điện thoại).*?giá\s*(\d+)/gi;
+    /([a-zA-ZÀ-ỹ\s]+?)\s*(?:giá|=)\s*(\d+)/gi;
 
-  const items: any[] = [];
-  let m;
+  const items: { name: string; price: number; qty: number }[] = [];
 
-  while ((m = itemRegex.exec(text))) {
+  let match;
+  while ((match = itemRegex.exec(text)) !== null) {
     items.push({
-      name: productMap[m[2]],
-      qty: m[1] ? Number(m[1]) : 1,
-      price: Number(m[3]),
+      name: match[1].trim(),
+      price: Number(match[2]),
+      qty: 1,
     });
+  }
+
+  // Nếu user chỉ nói "tạo invoice" → mock dữ liệu khác nhau mỗi lần
+  if (items.length === 0) {
+    const samples = [
+      [
+        { name: "Tivi Samsung", price: 3000, qty: 1 },
+        { name: "Tủ lạnh LG", price: 2000, qty: 1 },
+      ],
+      [
+        { name: "Laptop Dell", price: 1500, qty: 2 },
+      ],
+      [
+        { name: "Điện thoại iPhone", price: 2500, qty: 1 },
+        { name: "Tai nghe", price: 300, qty: 2 },
+      ],
+    ];
+    const random =
+      samples[Math.floor(Math.random() * samples.length)];
+    return { buyer, items: random };
   }
 
   return { buyer, items };
 }
 
-/*RANDOM INVOICE KHI USER KHÔNG NHẬP DỮ LIỆU */
-function randomInvoice() {
-  const names = ["Nam", "Việt", "An", "Minh", "Hùng"];
-  const products = [
-    { name: "Laptop", price: 8000 },
-    { name: "Tivi", price: 6000 },
-    { name: "Tủ lạnh", price: 7000 },
-    { name: "Điện thoại", price: 5000 },
-  ];
-
-  const buyer = names[Math.floor(Math.random() * names.length)];
-  const count = 1 + Math.floor(Math.random() * 2);
-
-  const items = Array.from({ length: count }).map(() => {
-    const p = products[Math.floor(Math.random() * products.length)];
-    return { ...p, qty: 1 };
-  });
-
-  return { buyer, items };
-}
-
-/* BUILD HTML INVOICE KHI USER NHẬP DỮ LIỆU */
-function buildInvoiceHTML(buyer: string, items: any[]) {
+/* =========================
+   HELPER: build invoice HTML
+========================= */
+function buildInvoiceHTML(
+  buyer: string,
+  items: { name: string; price: number; qty: number }[]
+) {
   let total = 0;
 
   const rows = items
     .map((i) => {
-      const sum = i.qty * i.price;
+      const sum = i.price * i.qty;
       total += sum;
       return `
-      <tr>
-        <td>${i.name}</td>
-        <td>${i.qty}</td>
-        <td>${i.price}</td>
-        <td>${sum}</td>
-      </tr>`;
+        <tr>
+          <td>${i.name}</td>
+          <td>${i.qty}</td>
+          <td>${i.price.toLocaleString()} đ</td>
+          <td>${sum.toLocaleString()} đ</td>
+        </tr>
+      `;
     })
     .join("");
 
   return `
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-<meta charset="utf-8"/>
+<meta charset="UTF-8" />
 <title>Invoice</title>
 <style>
-body{font-family:Arial;padding:20px}
-table{width:100%;border-collapse:collapse;margin-top:12px}
-th,td{border:1px solid #ccc;padding:8px;text-align:left}
-th{background:#f3f3f3}
-.total{font-weight:bold}
+body { font-family: Arial; padding: 24px; background:#f9fafb }
+h2 { margin-bottom: 8px }
+table { width:100%; border-collapse:collapse; margin-top:16px; background:white }
+th, td { border:1px solid #ddd; padding:8px }
+th { background:#f3f4f6 }
+.total { font-weight:bold }
 </style>
 </head>
 <body>
-<h2>HÓA ĐƠN</h2>
-<p><b>Người mua:</b> ${buyer}</p>
-<p><b>Ngày:</b> ${new Date().toLocaleDateString()}</p>
+<h2>HÓA ĐƠN BÁN HÀNG</h2>
+<p><b>Khách hàng:</b> ${buyer}</p>
+<p><b>Ngày:</b> ${new Date().toLocaleDateString("vi-VN")}</p>
 
 <table>
 <tr>
-<th>Sản phẩm</th>
-<th>Số lượng</th>
-<th>Đơn giá</th>
-<th>Thành tiền</th>
+  <th>Sản phẩm</th>
+  <th>Số lượng</th>
+  <th>Đơn giá</th>
+  <th>Thành tiền</th>
 </tr>
 ${rows}
 <tr class="total">
-<td colspan="3">TỔNG</td>
-<td>${total}</td>
+  <td colspan="3">TỔNG CỘNG</td>
+  <td>${total.toLocaleString()} đ</td>
 </tr>
 </table>
 </body>
@@ -131,41 +132,54 @@ ${rows}
    API HANDLER
 ========================= */
 export async function POST(req: Request) {
-  const { messages, model } = await req.json();
-  const last = messages[messages.length - 1]?.content || "";
+  try {
+    const { messages = [], model } = await req.json();
 
-  /* ===== INVOICE ===== */
-  if (isInvoiceRequest(last)) {
-    let data = parseInvoice(last);
+    const lastUser =
+      messages[messages.length - 1]?.content || "";
 
-    // CHỈ RANDOM KHI USER KHÔNG NHẬP GIÁ
-    if (data.items.length === 0) {
-      data = randomInvoice();
+    // ===== CASE 1: INVOICE =====
+    if (isInvoiceRequest(lastUser)) {
+      const data = parseInvoiceFromText(lastUser);
+      const html = buildInvoiceHTML(data.buyer, data.items);
+
+      return NextResponse.json({
+        type: "html",
+        content: html,
+      });
     }
 
-    const html = buildInvoiceHTML(data.buyer, data.items);
+    // ===== FIX CỨNG ROLE =====
+    const safeMessages = messages.map((m: any) => ({
+      role: m.role === "ai" ? "assistant" : m.role,
+      content: m.content,
+    }));
+
+    // ===== CASE 2: CHAT =====
+    const res = await openai.chat.completions.create({
+      model: model || "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Bạn là trợ lý tiếng Việt. Trả lời đúng trọng tâm, tự nhiên, không lan man.",
+        },
+        ...safeMessages,
+      ],
+    });
 
     return NextResponse.json({
-      type: "html",
-      content: html,
+      type: "text",
+      content: res.choices[0].message.content,
     });
-  }
-
-  /* ===== CHAT (NGẮN – ĐÚNG TRỌNG TÂM) ===== */
-  const res = await ollama.chat({
-    model: model || "llama3",
-    messages: [
+  } catch (err) {
+    console.error("API ERROR:", err);
+    return NextResponse.json(
       {
-        role: "system",
-        content:
-          "Bạn là trợ lý tiếng Việt. Trả lời đúng trọng tâm, không lan man, không giải thích thừa.",
+        type: "text",
+        content: "Hệ thống tạm lỗi, vui lòng thử lại.",
       },
-      ...messages,
-    ],
-  });
-
-  return NextResponse.json({
-    type: "text",
-    content: res.message?.content || "",
-  });
+      { status: 500 }
+    );
+  }
 }
