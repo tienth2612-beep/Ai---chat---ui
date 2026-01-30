@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import ModelSelect from "./ModelSelect";
 import InvoicePreview from "./InvoicePreview";
-import { parseInvoice } from "@/lib/invoice";
+import { parseInvoice } from "@/Lib/invoice";
 export default function ChatWindow() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
