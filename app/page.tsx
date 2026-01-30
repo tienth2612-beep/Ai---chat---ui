@@ -1,26 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+/* =====================
+   TYPES
+===================== */
 type Message = {
-  role: "user" | "ai";
+  role: "user" | "assistant";
   content: string;
+  preview?: string;
 };
 
+/* =====================
+   PAGE
+===================== */
 export default function Page() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [model, setModel] = useState("gpt-4o-mini");
-  const [invoiceHTML, setInvoiceHTML] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  async function sendMessage() {
+  /* =====================
+     LOAD HISTORY
+  ===================== */
+  useEffect(() => {
+    const saved = localStorage.getItem("chat-history");
+    if (saved) {
+      setMessages(JSON.parse(saved));
+    }
+  }, []);
+
+  /* =====================
+     SAVE + SCROLL
+  ===================== */
+  useEffect(() => {
+    localStorage.setItem("chat-history", JSON.stringify(messages));
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  /* =====================
+     SEND MESSAGE
+  ===================== */
+  async function send() {
     if (!input.trim() || loading) return;
 
-    const userMessage: Message = { role: "user", content: input };
-    const nextMessages = [...messages, userMessage];
+    const userMessage: Message = {
+      role: "user",
+      content: input,
+    };
 
-    setMessages(nextMessages);
+    // thêm message user
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
 
@@ -29,205 +60,159 @@ export default function Page() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: nextMessages,
+          messages: [...messages, userMessage],
           model,
         }),
       });
 
       const data = await res.json();
 
-      if (data.type === "html") {
-        // invoice
-        setInvoiceHTML(data.content);
-        setMessages([
-          ...nextMessages,
-          { role: "ai", content: "📄 Đã tạo hóa đơn" },
-        ]);
-      } else {
-        // chat
-        setMessages([
-          ...nextMessages,
-          { role: "ai", content: data.content },
-        ]);
-      }
-    } catch {
-      setMessages([
-        ...nextMessages,
-        { role: "ai", content: "❌ Lỗi hệ thống" },
-      ]);
-    }
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: data.content,
+        preview: data.preview,
+      };
 
-    setLoading(false);
+      // thêm message assistant (CHỈ 1 LẦN)
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "⚠️ Error occurred. Please try again.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   }
 
+  /* =====================
+     UI
+  ===================== */
   return (
-    <div style={styles.container}>
-      {/* LEFT: CHAT */}
-      <div style={styles.chatPanel}>
-        <div style={styles.header}>
-          <span style={styles.title}>AI Assistant</span>
+    <div style={{ display: "flex", height: "100vh", fontFamily: "system-ui" }}>
+      {/* ================= SIDEBAR ================= */}
+      <aside
+        style={{
+          width: 260,
+          background: "#0f0f0f",
+          color: "#fff",
+          padding: 16,
+        }}
+      >
+        <h3 style={{ marginBottom: 12 }}>AI Chat</h3>
 
-          <select
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            style={styles.select}
-          >
-            <option value="gpt-4o-mini">GPT-4o mini</option>
+        <button
+          style={{ width: "100%", marginBottom: 16 }}
+          onClick={() => setMessages([])}
+        >
+          + New Chat
+        </button>
+
+        <div style={{ fontSize: 12, opacity: 0.6 }}>Chat History</div>
+      </aside>
+
+      {/* ================= CHAT ================= */}
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          background: "#f9fafb",
+        }}
+      >
+        {/* Header */}
+        <header
+          style={{
+            padding: 12,
+            borderBottom: "1px solid #e5e7eb",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <strong>Conversation</strong>
+          <select value={model} onChange={(e) => setModel(e.target.value)}>
+            <option value="gpt-4o-mini">GPT-4o Mini</option>
             <option value="gpt-4o">GPT-4o</option>
           </select>
-        </div>
+        </header>
 
-        <div style={styles.messages}>
+        {/* Messages */}
+        <div style={{ flex: 1, padding: 16, overflowY: "auto" }}>
+          {messages.length === 0 && (
+            <div style={{ opacity: 0.6 }}>
+              <h3>Welcome 👋</h3>
+              <p>• Ask a question</p>
+              <p>• Create an invoice</p>
+              <p>• Switch models</p>
+            </div>
+          )}
+
           {messages.map((m, i) => (
-            <div
-              key={i}
-              style={{
-                ...styles.message,
-                alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                background:
-                  m.role === "user" ? "#2563eb" : "#f3f4f6",
-                color: m.role === "user" ? "#fff" : "#111",
-              }}
-            >
-              {m.content}
+            <div key={i} style={{ marginBottom: 16 }}>
+              <div
+                style={{
+                  textAlign: m.role === "user" ? "right" : "left",
+                }}
+              >
+                <div
+                  style={{
+                    display: "inline-block",
+                    padding: 12,
+                    borderRadius: 8,
+                    maxWidth: "80%",
+                    background:
+                      m.role === "user" ? "#2563eb" : "#e5e7eb",
+                    color: m.role === "user" ? "#fff" : "#000",
+                  }}
+                >
+                  {m.content}
+                </div>
+              </div>
+
+              {/* PREVIEW (invoice/html) */}
+              {m.preview && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    border: "1px solid #d1d5db",
+                    background: "#fff",
+                    padding: 8,
+                  }}
+                  dangerouslySetInnerHTML={{ __html: m.preview }}
+                />
+              )}
             </div>
           ))}
+
+          {loading && <div>AI is typing...</div>}
+          <div ref={bottomRef} />
         </div>
 
-        <div style={styles.inputBox}>
+        {/* Input */}
+        <footer
+          style={{
+            padding: 12,
+            borderTop: "1px solid #e5e7eb",
+            display: "flex",
+            gap: 8,
+          }}
+        >
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Nhập yêu cầu..."
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            style={styles.input}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            placeholder="Type your message..."
+            style={{ flex: 1, padding: 10 }}
+            disabled={loading}
           />
-          <button onClick={sendMessage} style={styles.button}>
-            {loading ? "..." : "Send"}
+          <button onClick={send} disabled={loading}>
+            Send
           </button>
-        </div>
-      </div>
-
-      {/* RIGHT: INVOICE */}
-      <div style={styles.invoicePanel}>
-        <div style={styles.invoiceHeader}>Invoice Preview</div>
-
-        {invoiceHTML ? (
-          <iframe
-            srcDoc={invoiceHTML}
-            style={styles.iframe}
-            title="invoice"
-          />
-        ) : (
-          <div style={styles.placeholder}>
-            Chưa có hóa đơn
-          </div>
-        )}
-      </div>
+        </footer>
+      </main>
     </div>
   );
 }
-
-/* ================= STYLES ================= */
-
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    display: "flex",
-    height: "100vh",
-    fontFamily: "Inter, Arial, sans-serif",
-    background: "#fafafa",
-  },
-
-  chatPanel: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    borderRight: "1px solid #e5e7eb",
-    background: "#fff",
-  },
-
-  header: {
-    padding: "12px 16px",
-    borderBottom: "1px solid #e5e7eb",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  title: {
-    fontWeight: 600,
-    fontSize: 16,
-  },
-
-  select: {
-    padding: "6px 8px",
-    borderRadius: 6,
-    border: "1px solid #ccc",
-  },
-
-  messages: {
-    flex: 1,
-    padding: 16,
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    overflowY: "auto",
-  },
-
-  message: {
-    maxWidth: "70%",
-    padding: "10px 14px",
-    borderRadius: 12,
-    fontSize: 14,
-    lineHeight: 1.4,
-  },
-
-  inputBox: {
-    display: "flex",
-    padding: 12,
-    borderTop: "1px solid #e5e7eb",
-    gap: 8,
-  },
-
-  input: {
-    flex: 1,
-    padding: "10px 12px",
-    borderRadius: 8,
-    border: "1px solid #ccc",
-    fontSize: 14,
-  },
-
-  button: {
-    padding: "0 16px",
-    borderRadius: 8,
-    border: "none",
-    background: "#2563eb",
-    color: "#fff",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-
-  invoicePanel: {
-    width: "45%",
-    display: "flex",
-    flexDirection: "column",
-    background: "#f9fafb",
-  },
-
-  invoiceHeader: {
-    padding: 12,
-    fontWeight: 600,
-    borderBottom: "1px solid #e5e7eb",
-  },
-
-  iframe: {
-    flex: 1,
-    border: "none",
-    background: "#fff",
-  },
-
-  placeholder: {
-    padding: 24,
-    color: "#888",
-  },
-};

@@ -1,13 +1,15 @@
 import "./globals.css";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="vi">
-      <body>{children}</body>
-    </html>
-  );
+
+export const metadata = {
+title: "AI Chat UI",
+};
+
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+return (
+<html lang="en">
+<body>{children}</body>
+</html>
+);
 }
