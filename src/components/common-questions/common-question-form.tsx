@@ -15,7 +15,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useWelcomeQuestions } from "@/hooks/use-welcome-questions";
+import { useCommonQuestions } from "@/hooks/use-common-questions";
 import { toast } from "sonner";
 import {
     Select,
@@ -24,7 +24,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { WELCOME_QUESTION_TYPE } from "@/lib/constants";
+import { COMMON_QUESTION_TYPE } from "@/lib/constants";
 
 const formSchema = z.object({
     title: z.string().min(2, {
@@ -38,14 +38,15 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export interface WelcomeQuestionFormProps {
+export interface CommonQuestionFormProps {
+    groupId: number;
     questionId?: number;
     onSuccess?: () => void;
     onCancel?: () => void;
 }
 
-export const WelcomeQuestionForm = forwardRef(function WelcomeQuestionForm(
-    { questionId, onSuccess, onCancel }: WelcomeQuestionFormProps,
+export const CommonQuestionForm = forwardRef(function CommonQuestionForm(
+    { groupId, questionId, onSuccess, onCancel }: CommonQuestionFormProps,
     ref
 ) {
     const router = useRouter();
@@ -55,14 +56,14 @@ export const WelcomeQuestionForm = forwardRef(function WelcomeQuestionForm(
         error,
         fetchQuestionDetail,
         saveQuestion,
-    } = useWelcomeQuestions();
+    } = useCommonQuestions();
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: "",
             code: "",
-            type: WELCOME_QUESTION_TYPE.SINGLE_CHOICE,
+            type: COMMON_QUESTION_TYPE.SINGLE_CHOICE,
         },
     });
 
@@ -71,7 +72,7 @@ export const WelcomeQuestionForm = forwardRef(function WelcomeQuestionForm(
             form.reset({
                 title: "",
                 code: "",
-                type: WELCOME_QUESTION_TYPE.SINGLE_CHOICE,
+                type: COMMON_QUESTION_TYPE.SINGLE_CHOICE,
             }),
     }));
 
@@ -94,11 +95,12 @@ export const WelcomeQuestionForm = forwardRef(function WelcomeQuestionForm(
     const onSubmit = async (values: FormValues) => {
         try {
             await saveQuestion(
+                groupId,
                 {
                     ...values,
-                    type: values.type,
+                    status: 1, // Default active status
                 },
-                questionId ?? 0
+                questionId
             );
             toast.success(
                 questionId
@@ -106,7 +108,7 @@ export const WelcomeQuestionForm = forwardRef(function WelcomeQuestionForm(
                     : "Question created successfully."
             );
             if (onSuccess) onSuccess();
-            router.push("/settings/welcome-questions");
+            router.push(`/settings/common-questions/groups/${groupId}`);
         } catch (error) {
             toast.error("Something went wrong. Please try again.");
         }
@@ -173,12 +175,12 @@ export const WelcomeQuestionForm = forwardRef(function WelcomeQuestionForm(
                                         </FormControl>
                                         <SelectContent>
                                             <SelectItem
-                                                value={WELCOME_QUESTION_TYPE.SINGLE_CHOICE.toString()}
+                                                value={COMMON_QUESTION_TYPE.SINGLE_CHOICE.toString()}
                                             >
                                                 Single Choice
                                             </SelectItem>
                                             <SelectItem
-                                                value={WELCOME_QUESTION_TYPE.MULTIPLE_CHOICE.toString()}
+                                                value={COMMON_QUESTION_TYPE.MULTIPLE_CHOICE.toString()}
                                             >
                                                 Multiple Choice
                                             </SelectItem>

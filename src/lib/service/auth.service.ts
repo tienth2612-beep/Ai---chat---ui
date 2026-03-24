@@ -21,10 +21,10 @@ export const authService = {
     },
 
     googleLogin: async (
-        token: string
+        data: UserAuth.GoogleLoginResponse
     ): Promise<BaseResultWithData<UserAuth.UserAuthResponse>> => {
         try {
-            return await api.post(API_URL.AUTH_GOOGLE_LOGIN, { token });
+            return await api.post(API_URL.AUTH_GOOGLE_LOGIN, data);
         } catch (error: any) {
             if (error) {
                 return error;

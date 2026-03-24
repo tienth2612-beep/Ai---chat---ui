@@ -1,10 +1,12 @@
 import axios from "axios";
 
+// var baseUrl =
+//     process.env.NEXT_PUBLIC_API_URL ||
+//     "https://hitradies-backoffice-api-9zcxn.ondigitalocean.app/api/";
+const baseUrl = "https://localhost:7003/api/";
 // Create axios instance with default config
 const api = axios.create({
-    baseURL:
-        process.env.NEXT_PUBLIC_API_URL ||
-        "https://hitradies-backoffice-api-9zcxn.ondigitalocean.app/api/",
+    baseURL: baseUrl,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
@@ -12,9 +14,7 @@ const api = axios.create({
 });
 
 export const apiFormBuilder = axios.create({
-    baseURL:
-        process.env.NEXT_PUBLIC_API_URL ||
-        "https://hitradies-backoffice-api-9zcxn.ondigitalocean.app/api/",
+    baseURL: baseUrl,
     withCredentials: true,
     headers: {
         "Content-Type": "multipart/form-data",

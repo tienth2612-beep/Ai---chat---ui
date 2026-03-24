@@ -1,10 +1,23 @@
 import { FilterRequest } from "./api";
 
+export interface CommonGroupQuestionResponse {
+    id: number;
+    name: string;
+    description: string;
+    createAt: string;
+    createBy: number;
+    updateAt: string;
+    updateBy: number;
+    status: boolean;
+    totalCount: number;
+}
+
 export interface QuestionResponse {
     id: number;
     title: string;
     type: number;
     code: string | null;
+    questionGroup: number;
     status: number;
     createAt: string;
     createBy: number;
@@ -41,6 +54,10 @@ export interface InitQuestionRequest {
     type: number;
     code: string | null;
     status: number;
+}
+export interface InitGroupRequest {
+    name: string;
+    description: string;
 }
 export interface InitAnswerRequest {
     questionId: number;

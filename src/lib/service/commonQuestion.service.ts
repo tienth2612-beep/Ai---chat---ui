@@ -3,14 +3,69 @@ import { BaseResult, BaseResultWithData, PageResult } from "@/types/api";
 import * as UserAuth from "@/types/auth";
 import { UserResponse } from "@/types/user";
 import { API_URL } from "../constants";
-import * as WelcomeQuestionModel from "@/types/welcomeQuestion";
+import * as WelcomeQuestionModel from "@/types/commonQuestion";
 
-export const welcomeQuestionService = {
-    getQuestions: async (
+export const commonQuestionService = {
+    getGroups: async (): Promise<
+        PageResult<WelcomeQuestionModel.CommonGroupQuestionResponse[]>
+    > => {
+        try {
+            return await api.get(API_URL.COMMON_QUESTION);
+        } catch (error: any) {
+            if (error) {
+                return error;
+            }
+            throw error;
+        }
+    },
+    createGroup: async (
+        data: Partial<WelcomeQuestionModel.InitGroupRequest>
+    ): Promise<BaseResultWithData<boolean>> => {
+        try {
+            return await api.post(API_URL.COMMON_QUESTION, data);
+        } catch (error: any) {
+            if (error) {
+                return error;
+            }
+            throw error;
+        }
+    },
+    updateGroup: async (
+        id: number,
+        data: Partial<WelcomeQuestionModel.InitGroupRequest>
+    ): Promise<BaseResultWithData<boolean>> => {
+        try {
+            return await api.put(`${API_URL.COMMON_QUESTION}/${id}`, data);
+        } catch (error: any) {
+            if (error) {
+                return error;
+            }
+            throw error;
+        }
+    },
+
+    toggleGroupStatus: async (
+        id: number,
+        data: Partial<WelcomeQuestionModel.InitGroupRequest>
+    ): Promise<BaseResultWithData<boolean>> => {
+        try {
+            return await api.patch(`${API_URL.COMMON_QUESTION}/${id}`, data);
+        } catch (error: any) {
+            if (error) {
+                return error;
+            }
+            throw error;
+        }
+    },
+
+    getQuestionsInGroup: async (
+        groupId: number,
         data: Partial<WelcomeQuestionModel.GetQuestionRequest>
     ): Promise<PageResult<WelcomeQuestionModel.QuestionResponse>> => {
         try {
-            return await api.get(API_URL.WELCOME_QUESTION, { params: data });
+            return await api.get(`${API_URL.COMMON_QUESTION}/${groupId}`, {
+                params: data,
+            });
         } catch (error: any) {
             if (error) {
                 return error;
@@ -25,7 +80,7 @@ export const welcomeQuestionService = {
         BaseResultWithData<WelcomeQuestionModel.QuestionDetailResponse>
     > => {
         try {
-            return await api.get(`${API_URL.WELCOME_QUESTION}/${id}`);
+            return await api.get(`${API_URL.COMMON_QUESTION}/question/${id}`);
         } catch (error: any) {
             if (error) {
                 return error;
@@ -34,10 +89,14 @@ export const welcomeQuestionService = {
         }
     },
     createQuestion: async (
+        groupId: number,
         data: Partial<WelcomeQuestionModel.InitQuestionRequest>
     ): Promise<BaseResultWithData<boolean>> => {
         try {
-            return await api.post(API_URL.WELCOME_QUESTION, data);
+            return await api.post(
+                `${API_URL.COMMON_QUESTION}/${groupId}`,
+                data
+            );
         } catch (error: any) {
             if (error) {
                 return error;
@@ -51,7 +110,10 @@ export const welcomeQuestionService = {
         data: Partial<WelcomeQuestionModel.InitQuestionRequest>
     ): Promise<BaseResultWithData<boolean>> => {
         try {
-            return await api.put(`${API_URL.WELCOME_QUESTION}/${id}`, data);
+            return await api.put(
+                `${API_URL.COMMON_QUESTION}/question/${id}`,
+                data
+            );
         } catch (error: any) {
             if (error) {
                 return error;
@@ -64,7 +126,10 @@ export const welcomeQuestionService = {
         data: WelcomeQuestionModel.InitQuestionRequest
     ): Promise<BaseResultWithData<boolean>> => {
         try {
-            return await api.patch(`${API_URL.WELCOME_QUESTION}/${id}`, data);
+            return await api.patch(
+                `${API_URL.COMMON_QUESTION}/question/${id}`,
+                data
+            );
         } catch (error: any) {
             if (error) {
                 return error;
@@ -78,7 +143,7 @@ export const welcomeQuestionService = {
     ): Promise<BaseResultWithData<WelcomeQuestionModel.AnswerResponse>> => {
         try {
             return await api.get(
-                `${API_URL.WELCOME_QUESTION}/${questionId}/answers/${answerId}`
+                `${API_URL.COMMON_QUESTION}/question/${questionId}/answers/${answerId}`
             );
         } catch (error: any) {
             if (error) {
@@ -94,7 +159,7 @@ export const welcomeQuestionService = {
     ): Promise<BaseResultWithData<WelcomeQuestionModel.AnswerResponse>> => {
         try {
             return await api.post(
-                `${API_URL.WELCOME_QUESTION}/${questionId}/answers`,
+                `${API_URL.COMMON_QUESTION}/question/${questionId}/answers`,
                 data
             );
         } catch (error: any) {
@@ -112,7 +177,7 @@ export const welcomeQuestionService = {
     ): Promise<BaseResultWithData<WelcomeQuestionModel.AnswerResponse>> => {
         try {
             return await api.put(
-                `${API_URL.WELCOME_QUESTION}/${questionId}/answers/${answerId}`,
+                `${API_URL.COMMON_QUESTION}/question/${questionId}/answers/${answerId}`,
                 data
             );
         } catch (error: any) {
@@ -129,7 +194,7 @@ export const welcomeQuestionService = {
     ): Promise<BaseResultWithData<WelcomeQuestionModel.AnswerResponse>> => {
         try {
             return await api.patch(
-                `${API_URL.WELCOME_QUESTION}/${questionId}/answers/${answerId}`,
+                `${API_URL.COMMON_QUESTION}/question/${questionId}/answers/${answerId}`,
                 data
             );
         } catch (error: any) {

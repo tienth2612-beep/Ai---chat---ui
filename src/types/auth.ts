@@ -49,4 +49,9 @@ export interface OTPPasswordResponse {
     verify: number;
     resendAfter: number;
 }
+
+export type GoogleLoginResponse = {
+    credential: string;
+    referralCode: string;
+  };
 //#endregion

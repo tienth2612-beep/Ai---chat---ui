@@ -38,6 +38,9 @@ export interface RoleResponse {
     id: number;
     roleName: string;
     description: string;
+    level: number;
+    parentId: number;
+    subRoles: RoleResponse[];
     active: boolean;
     createBy: number;
     createAt: string;

@@ -38,14 +38,14 @@ export const API_URL = {
     TIMEZONES: "Common/timezones",
 
     //welcome question
-    WELCOME_QUESTION: "welcomeQuestion",
+    COMMON_QUESTION: "CommonQuestion",
 
     //excel
     UPLOAD_TEMPLATE: "setting/upload-template-excel",
     GET_TEMPLATES: "setting/templates-excel",
 };
 
-export const WELCOME_QUESTION_TYPE = {
+export const COMMON_QUESTION_TYPE = {
     SINGLE_CHOICE: 0,
     MULTIPLE_CHOICE: 1,
 };

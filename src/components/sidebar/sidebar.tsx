@@ -135,7 +135,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                 },
                 {
                     title: "Common Questions",
-                    href: "/settings/welcome-questions",
+                    href: "/settings/common-questions",
                     icon: HelpCircle,
                 },
                 {

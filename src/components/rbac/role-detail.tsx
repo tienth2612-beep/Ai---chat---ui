@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Edit, ArrowLeft, PlusCircle, X, Search } from "lucide-react";
+import { Edit, ArrowLeft, PlusCircle, X, Search, Users } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import * as RbacModel from "@/types/rbac";
 import { useRbac } from "@/hooks/use-rbac";
@@ -20,6 +20,16 @@ import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { DataTable } from "../ui/data-table";
 import { Switch } from "../ui/switch";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { SubroleTable } from "./subrole-table";
+import { SubroleForm } from "./subrole-form";
 interface RoleDetailProps {
     id: string;
 }
@@ -34,7 +44,13 @@ export function RoleDetail({ id }: RoleDetailProps) {
         getRoleAssignments,
         permissionsOfRole,
         role,
+        updateRole,
     } = useRbac();
+
+    // State for subrole management
+    const [showSubroleDialog, setShowSubroleDialog] = useState(false);
+    const [editingSubrole, setEditingSubrole] =
+        useState<RbacModel.RoleResponse | null>(null);
 
     useEffect(() => {
         const fetchRole = async () => {

@@ -166,6 +166,7 @@ export function useRbac() {
             setError(null);
             try {
                 const response = await rbacService.getListRoles(filters);
+                console.log(response);
                 if (response.items && response) {
                     setRoles(response.items);
                     setTotalRoles(response.totalCount);

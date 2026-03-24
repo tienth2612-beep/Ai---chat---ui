@@ -21,9 +21,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Info, MoreHorizontal } from "lucide-react";
-import { useWelcomeQuestions } from "@/hooks/use-welcome-questions";
+import { useCommonQuestions } from "@/hooks/use-common-questions";
 import { format } from "date-fns";
-import { WELCOME_QUESTION_TYPE } from "@/lib/constants";
+import { COMMON_QUESTION_TYPE } from "@/lib/constants";
 import { DataTableSearch } from "../data-table-search";
 import { DataTablePagination } from "../ui/data-table-pagination";
 import { DateRange } from "react-day-picker";
@@ -34,26 +34,22 @@ import {
     TooltipContent,
     TooltipProvider,
 } from "@/components/ui/tooltip";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogTitle,
-    DialogTrigger,
-} from "@radix-ui/react-dialog";
-import { DialogHeader } from "../ui/dialog";
-import { WelcomeQuestionForm } from "./welcome-question-form";
+import { CommonQuestionForm } from "@/components/common-questions/common-question-form";
 
-export function WelcomeQuestionTable() {
+export interface CommonQuestionTableProps {
+    groupId: number;
+}
+
+export function CommonQuestionTable({ groupId }: CommonQuestionTableProps) {
     const router = useRouter();
     const {
         questions,
         loading,
         error,
         totalQuestions,
-        fetchQuestions,
+        fetchQuestionsInGroup,
         toggleQuestionStatus,
-    } = useWelcomeQuestions();
+    } = useCommonQuestions();
     // Search and filter state
     const [currentSearchTerm, setCurrentSearchTerm] = useState("");
     const [currentDateRange, setCurrentDateRange] = useState<
@@ -80,7 +76,7 @@ export function WelcomeQuestionTable() {
         } = params;
 
         try {
-            await fetchQuestions({
+            await fetchQuestionsInGroup(groupId, {
                 search: searchTerm,
                 fromDate: dateRange?.from
                     ? format(dateRange.from, "yyyy-MM-dd")
@@ -140,7 +136,7 @@ export function WelcomeQuestionTable() {
     return (
         <div className="space-y-4">
             <DataTableSearch
-                placeholder="Search welcome questions..."
+                placeholder="Search questions..."
                 onSearch={handleSearch}
                 initialSearchTerm={currentSearchTerm}
                 initialDateRange={currentDateRange}
@@ -190,7 +186,7 @@ export function WelcomeQuestionTable() {
                                     </TableCell>
                                     <TableCell>
                                         {q.type ===
-                                        WELCOME_QUESTION_TYPE.SINGLE_CHOICE
+                                        COMMON_QUESTION_TYPE.SINGLE_CHOICE
                                             ? "Single Choice"
                                             : "Multiple Choice"}
                                     </TableCell>
@@ -236,7 +232,7 @@ export function WelcomeQuestionTable() {
                                                 <DropdownMenuItem
                                                     onClick={() =>
                                                         router.push(
-                                                            `/settings/welcome-questions/${q.id}`
+                                                            `/settings/common-questions/groups/${groupId}/questions/${q.id}`
                                                         )
                                                     }
                                                 >

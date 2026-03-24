@@ -1,15 +1,19 @@
 "use client";
 
-import { WelcomeQuestionForm } from "@/components/welcome-questions/welcome-question-form";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function NewWelcomeQuestionPage() {
+    const router = useRouter();
+
+    useEffect(() => {
+        // Redirect to new common questions page
+        router.replace("/settings/common-questions");
+    }, [router]);
+
     return (
-        <div className="max-w-xl mx-auto py-8">
-            <h2 className="text-2xl font-bold mb-2">Create New Question</h2>
-            <p className="text-muted-foreground mb-6">
-                Fill in the details to create a new welcome question.
-            </p>
-            <WelcomeQuestionForm />
+        <div className="flex items-center justify-center h-64">
+            <p>Redirecting to Common Questions...</p>
         </div>
     );
 }
