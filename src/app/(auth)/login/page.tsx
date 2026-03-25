@@ -166,8 +166,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* BRANDING & FEATURES */}
-      <div className="hidden lg:flex w-1/2 min-h-screen bg-gradient-to-tr from-[#007bff] via-[#f0f7ff] to-[#4298f5] flex-col p-8 relative overflow-hidden">
+      {/* BRANDING & FEATURES - ĐÃ CẬP NHẬT MÀU THEO GỢI Ý */}
+      <div className="hidden lg:flex w-1/2 min-h-screen bg-gradient-to-tr from-[#007bff] via-[#bfe1ff] to-[#4298f5] flex-col p-8 relative overflow-hidden">
         
         <div className="absolute inset-0 opacity-[0.06] pointer-events-none" 
              style={{ backgroundImage: 'radial-gradient(circle, #000 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }} 
@@ -193,7 +193,7 @@ export default function LoginPage() {
                   className="flex flex-col items-center gap-2 cursor-pointer group"
                 >
                   <div className={`w-20 h-20 rounded-[24px] transition-all duration-300 shadow-lg flex items-center justify-center 
-                    ${hoveredFeature?.id === feat.id ? 'bg-[#00A3FF] text-white scale-105' : 'bg-white/60 text-blue-900 hover:bg-white/90'}`}
+                    ${hoveredFeature?.id === feat.id ? 'bg-[#007bff] text-white scale-105' : 'bg-white/60 text-blue-900 hover:bg-white/90'}`}
                   >
                     {React.cloneElement(feat.icon as React.ReactElement, { size: 28, strokeWidth: 2.2 })}
                   </div>
@@ -209,7 +209,7 @@ export default function LoginPage() {
                 <div className="w-full bg-white rounded-[28px] p-6 shadow-xl shadow-blue-900/10 border border-white/50 animate-in fade-in zoom-in duration-200 text-left relative">
                   <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45" />
                   <h4 className="text-blue-900 font-bold text-sm mb-1 flex items-center gap-2">
-                    <CheckCircle2 className="text-[#00A3FF]" size={16} />
+                    <CheckCircle2 className="text-[#007bff]" size={16} />
                     {hoveredFeature.title}
                   </h4>
                   <p className="text-slate-600 text-[13px] leading-relaxed italic">
@@ -220,7 +220,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* COMPACT METRICS */}
           <div className="mt-8 w-full max-w-sm grid grid-cols-3 gap-4 py-4 px-6 bg-white/30 backdrop-blur-xl border border-white/40 rounded-[24px] shadow-sm">
              <div className="flex flex-col">
                 <span className="text-xl font-black text-blue-900 tracking-tighter">5K+</span>
