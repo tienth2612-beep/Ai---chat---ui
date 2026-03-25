@@ -57,6 +57,17 @@ export default function LoginPage() {
     setTimeout(() => setIsLoading(false), 2000);
   };
 
+  // Logic tính toán vị trí mũi tên dựa trên ID của icon (1-4)
+  const getArrowPosition = (id: number) => {
+    const positions: Record<number, string> = {
+      1: "left-[12.5%]",
+      2: "left-[37.5%]",
+      3: "left-[62.5%]",
+      4: "left-[87.5%]",
+    };
+    return positions[id] || "left-1/2";
+  };
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen w-full font-sans bg-white">
       
@@ -166,7 +177,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* BRANDING & FEATURES - ĐÃ CẬP NHẬT MÀU THEO GỢI Ý */}
+      {/* BRANDING & FEATURES */}
       <div className="hidden lg:flex w-1/2 min-h-screen bg-gradient-to-tr from-[#007bff] via-[#bfe1ff] to-[#4298f5] flex-col p-8 relative overflow-hidden">
         
         <div className="absolute inset-0 opacity-[0.06] pointer-events-none" 
@@ -206,8 +217,10 @@ export default function LoginPage() {
 
             <div className="w-full h-[130px] flex items-center justify-center">
               {hoveredFeature && (
-                <div className="w-full bg-white rounded-[28px] p-6 shadow-xl shadow-blue-900/10 border border-white/50 animate-in fade-in zoom-in duration-200 text-left relative">
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45" />
+                <div className="w-full max-w-md bg-white rounded-[28px] p-6 shadow-xl shadow-blue-900/10 border border-white/50 animate-in fade-in zoom-in duration-200 text-left relative">
+                  {/* Mũi tên đã được sửa logic để di chuyển theo icon */}
+                  <div className={`absolute -top-1.5 w-3 h-3 bg-white rotate-45 -translate-x-1/2 transition-all duration-300 ${getArrowPosition(hoveredFeature.id)}`} />
+                  
                   <h4 className="text-blue-900 font-bold text-sm mb-1 flex items-center gap-2">
                     <CheckCircle2 className="text-[#007bff]" size={16} />
                     {hoveredFeature.title}
