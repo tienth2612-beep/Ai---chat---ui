@@ -57,7 +57,6 @@ export default function LoginPage() {
     setTimeout(() => setIsLoading(false), 2000);
   };
 
-  // Logic tính toán vị trí mũi tên dựa trên ID của icon (1-4)
   const getArrowPosition = (id: number) => {
     const positions: Record<number, string> = {
       1: "left-[12.5%]",
@@ -82,7 +81,7 @@ export default function LoginPage() {
               <ShieldCheck className="w-5 h-5 text-[#0066FF] shrink-0" />
             </div>
             <p className="text-sm text-slate-500 font-medium">
-              Internal system for HiTradies administrators.
+              Internal system for HiTradies administrators
             </p>
           </div>
 
@@ -218,7 +217,6 @@ export default function LoginPage() {
             <div className="w-full h-[130px] flex items-center justify-center">
               {hoveredFeature && (
                 <div className="w-full max-w-md bg-white rounded-[28px] p-6 shadow-xl shadow-blue-900/10 border border-white/50 animate-in fade-in zoom-in duration-200 text-left relative">
-                  {/* Mũi tên đã được sửa logic để di chuyển theo icon */}
                   <div className={`absolute -top-1.5 w-3 h-3 bg-white rotate-45 -translate-x-1/2 transition-all duration-300 ${getArrowPosition(hoveredFeature.id)}`} />
                   
                   <h4 className="text-blue-900 font-bold text-sm mb-1 flex items-center gap-2">
