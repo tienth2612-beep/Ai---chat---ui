@@ -59,12 +59,13 @@ export function LoginForm() {
         try {
             // Initialize Google Sign-In
             const google = window.google;
+            const accounts = google?.accounts as any;
             if (!google) {
                 toast.error("Google Sign-In is not available");
                 return;
             }
 
-            const client = google.accounts.oauth2.initTokenClient({
+            const client = accounts?.oauth2?.initTokenClient({
                 client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
                 scope: "email profile",
                 callback: async (response: any) => {
@@ -86,7 +87,7 @@ export function LoginForm() {
                 },
             });
 
-            client.requestAccessToken();
+            client?.requestAccessToken();
         } catch (error) {
             console.error("Google login error:", error);
             toast.error("Failed to initialize Google Sign-In");
