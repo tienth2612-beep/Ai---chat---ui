@@ -34,12 +34,13 @@ export function LoginForm() {
     });
   };
 
+  // Logic kiểm tra lỗi từ server để hiển thị cạnh ô nhập liệu
   const isEmailError = authError?.toLowerCase().includes("email");
   const isPasswordError = authError?.toLowerCase().includes("password");
 
   return (
     <div className="bg-white rounded-[32px] px-10 py-10 shadow-2xl shadow-blue-900/20 animate-in fade-in zoom-in-95 duration-700">
-
+      {/* HEADER - TĂNG LOGO VÀ KHOẢNG CÁCH */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-6">
           <img src="/logo-hitradies-standard-04.png" alt="Logo" className="h-20 w-auto object-contain" />
@@ -52,7 +53,7 @@ export function LoginForm() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-    
+        {/* EMAIL FIELD - TĂNG CHIỀU CAO H-12 */}
         <div className="space-y-1.5">
           <Label className="text-[13px] font-semibold text-slate-900 ml-1">Email Address</Label>
           <Input 
@@ -71,10 +72,11 @@ export function LoginForm() {
           )}
         </div>
 
+        {/* PASSWORD FIELD - TĂNG CHIỀU CAO H-12 */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between ml-1">
             <Label className="text-[13px] font-semibold text-slate-900">Password</Label>
-            <Link href="/auth/forgot-password" title="Quên mật khẩu" className="text-[12px] hover:text-slate-900 hover:underline cursor-pointer transition-colors">
+            <Link href="/auth/forgot-password" title="Quên mật khẩu" className="text-[12px] text-slate-500 hover:text-slate-900 hover:underline cursor-pointer transition-colors">
               Forgot password?
             </Link>
           </div>
@@ -102,6 +104,7 @@ export function LoginForm() {
           )}
         </div>
 
+        {/* LOGIN BUTTON */}
         <Button 
           type="submit" 
           disabled={isLoading} 
@@ -110,11 +113,13 @@ export function LoginForm() {
           {isLoading ? <Loader2 className="animate-spin mr-2 w-5 h-5" /> : "Login"}
         </Button>
 
+        {/* Lỗi hệ thống khác */}
         {authError && !isEmailError && !isPasswordError && (
            <p className="text-[12.5px] text-red-500 text-center font-bold mt-2">{authError}</p>
         )}
       </form>
 
+      {/* DIVIDER - TĂNG MARGIN Y */}
       <div className="relative my-8">
         <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
         <div className="relative flex justify-center text-[10px] uppercase tracking-[0.15em] text-slate-400 font-bold">
@@ -122,6 +127,7 @@ export function LoginForm() {
         </div>
       </div>
 
+      {/* SOCIAL LOGIN - TĂNG H-12 */}
       <Button 
         type="button"
         variant="outline" 
@@ -131,6 +137,7 @@ export function LoginForm() {
         <span className="text-[13px]">Đăng nhập bằng Google</span>
       </Button>
 
+      {/* FOOTER - TĂNG MT */}
       <div className="text-center mt-9 text-[13.5px] text-slate-500">
         Don't have an account?{" "}
         <Link href="/auth/sign-up" title="Đăng ký tài khoản" className="font-bold text-slate-900 underline underline-offset-4 cursor-pointer hover:text-[#00A3FF] transition-colors">

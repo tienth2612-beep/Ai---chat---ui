@@ -1,15 +1,12 @@
-import { LoginForm } from "./components/login-form";
-import { BrandingSection } from "./components/branding-section";
+import { LoginForm } from "@/app/(auth)/login/components/login-form";
+import { AuthBackground } from "@/app/(auth)/login/components/auth-background";
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-col lg:flex-row min-h-screen w-full font-sans bg-white">
-      <section className="w-full lg:w-1/2 border-r border-slate-100 min-h-screen flex flex-col p-6 py-12">
+    <main className="min-h-screen w-full font-sans overflow-hidden">
+      <AuthBackground>
         <LoginForm />
-      </section>
-
-    
-      <BrandingSection />
+      </AuthBackground>
     </main>
   );
 }
