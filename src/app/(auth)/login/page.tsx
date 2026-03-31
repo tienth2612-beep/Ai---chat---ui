@@ -1,5 +1,5 @@
-import { LoginForm } from "@/app/(auth)/login/components/login-form";
-import { AuthBackground } from "@/app/(auth)/login/components/auth-background";
+import { LoginForm } from "@/components/auth/login-form";
+import { AuthBackground } from "@/components/auth/auth-background";
 
 export default function LoginPage() {
   return (

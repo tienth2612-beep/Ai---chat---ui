@@ -1,114 +1,201 @@
 "use client";
+
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, Wallet, ShoppingCart, Calendar } from "lucide-react";
+import { 
+  PanelLeft, Search, CircleHelp, Settings, ExternalLink, Users, TrendingUp, TrendingDown 
+} from "lucide-react";
 
-export default function DashboardPage() {
+export default function HitradiesExactFinalWithData() {
   return (
-    <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
-      
-      {/* Title & Filter Bar */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Dashboard</h2>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-1">Soft UI Statistics</p>
-        </div>
-        <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2 text-sm font-bold text-slate-500">
-           <Calendar size={16} className="text-blue-500"/> Last 30 days
-        </div>
-      </div>
-
-      {/* 4 Stat Cards (Theo Ảnh 3) */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <SoftStatCard title="Today's Money" value="$53,000" change="+55%" icon={<Wallet size={18}/>} color="bg-gradient-to-tr from-pink-500 to-rose-400" />
-        <SoftStatCard title="Today's Users" value="2,300" change="+3%" icon={<Users size={18}/>} color="bg-gradient-to-tr from-purple-600 to-indigo-400" />
-        <SoftStatCard title="New Clients" value="+3,462" change="-2%" icon={<ShoppingCart size={18}/>} color="bg-gradient-to-tr from-emerald-500 to-teal-400" isNegative />
-        <SoftStatCard title="Sales" value="$103,430" change="+5%" icon={<TrendingUp size={18}/>} color="bg-gradient-to-tr from-orange-500 to-amber-400" />
-      </div>
-
-      {/* Charts / Activity Grid (Bố cục Ảnh 3) */}
-      <div className="grid gap-8 md:grid-cols-7">
+    <div className="group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar">
+      <main className="relative flex min-h-svh flex-1 flex-col bg-background">
         
-        {/* Biểu đồ Active Users (Chiếm 4 cột) */}
-        <Card className="col-span-4 border-none shadow-2xl shadow-slate-200/50 rounded-[30px] bg-white/90 backdrop-blur-sm overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-bold text-slate-800">Sales Overview</CardTitle>
-            <p className="text-[11px] font-bold text-green-500 uppercase tracking-tighter">(+23%) <span className="text-slate-400">than last week</span></p>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {/* Giả lập biểu đồ của Ảnh 3 */}
-            <div className="h-64 w-full bg-slate-900 rounded-[24px] p-6 flex flex-col justify-between shadow-2xl shadow-slate-900/20">
-               <div className="flex items-end justify-between gap-1.5 h-36 px-2">
-                  {[30, 60, 45, 80, 50, 95, 40, 75, 60].map((h, i) => (
-                    <div key={i} style={{height: `${h}%`}} className="flex-1 bg-white/20 hover:bg-white/40 rounded-full transition-all cursor-pointer" />
-                  ))}
-               </div>
-               <div className="grid grid-cols-4 gap-4 mt-4">
-                  <MiniStat label="Users" val="36K" />
-                  <MiniStat label="Clicks" val="2m" />
-                  <MiniStat label="Sales" val="435$" />
-                  <MiniStat label="Items" val="43" />
-               </div>
+        {/* HEADER - GIỮ NGUYÊN */}
+        <header className="flex h-16 shrink-0 items-center border-b bg-white px-4">
+          <div className="flex w-full items-center gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent h-7 w-7">
+                <PanelLeft className="lucide lucide-panel-left size-10" />
+                <span className="sr-only">Toggle Sidebar</span>
+              </button>
+              <div data-orientation="vertical" role="none" className="shrink-0 bg-border w-[1px] mx-1 h-4 hidden lg:block"></div>
+              <div className="hidden lg:block truncate"></div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Activity / Orders (Chiếm 3 cột) */}
-        <Card className="col-span-3 border-none shadow-2xl shadow-slate-200/50 rounded-[30px] bg-white/90">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-slate-800">Orders overview</CardTitle>
-            <p className="text-[11px] font-bold text-green-500 uppercase tracking-tighter">+24% <span className="text-slate-400">this month</span></p>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-4">
-            <OrderItem text="Payment received" time="2 hours ago" color="text-blue-500" />
-            <OrderItem text="New user registered" time="5 hours ago" color="text-purple-500" />
-            <OrderItem text="Membership upgraded" time="1 day ago" color="text-emerald-500" />
-            <OrderItem text="Server maintenance" time="2 days ago" color="text-orange-500" />
-          </CardContent>
-        </Card>
+            <div className="relative mx-auto hidden w-full max-w-xl md:block">
+              <Search className="lucide lucide-search pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
+              <input 
+                className="flex w-full border px-3 py-1 text-base transition-colors h-10 rounded-full border-zinc-200 bg-white pl-10 pr-4 shadow-sm md:text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" 
+                placeholder="Search Total user, Active membership, Revenue  ..."
+              />
+            </div>
 
-      </div>
+            <div className="ml-auto flex items-center gap-2">
+              <a className="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent" href="/help">
+                <CircleHelp className="lucide lucide-circle-help size-4" />
+              </a>
+              <a className="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent" href="/settings">
+                <Settings className="lucide lucide-settings size-4" />
+              </a>
+              <button type="button" className="flex size-10 items-center justify-center rounded-full bg-white transition-colors hover:bg-zinc-50">
+                <span className="relative flex shrink-0 overflow-hidden size-9 rounded-full">
+                  <span className="flex h-full w-full items-center justify-center rounded-full text-xs bg-[#0070f3] text-white">ĐT</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* MAIN CONTENT - GIỮ NGUYÊN Ô, THÊM THÔNG SỐ & TREND */}
+        <main className="z-50">
+          <div className="p-6 space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              
+
+              <StatCard 
+                title="Total users" 
+                value="25" 
+                trend="+12%"
+                isUp={true}
+                highlight 
+                rows={[
+                  { label: "Tradies", val: "15" },
+                  { label: "Clients", val: "10" },
+                  { label: "Pending Approval", val: "4"}
+                ]} 
+              />
+
+              {/* 2. Quotes */}
+              <StatCard 
+                title="Memberships" 
+                value="18" 
+                trend="-2%"
+                isUp={false}
+                rows={[
+                  { label: "Pro Tier", val: "12" },
+                  { label: "Basic Tier", val: "6" },
+                  { label: "Expiring Soon", val: "3" }
+                ]} 
+              />
+
+              {/* 3. Jobs */}
+              <StatCard 
+                title="Quotes" 
+                value="45" 
+                trend="+8%"
+                isUp={true}
+                rows={[
+                  { label: "Awaiting Response", val: "28" },
+                  { label: "Accepted", val: "12" },
+                  { label: "Declined", val: "5" }
+                ]} 
+              />
+
+              {/* 4. Invoices */}
+              <StatCard 
+                title="Invoices" 
+                value="29" 
+                trend="+10%"
+                isUp={true}
+                rows={[
+                  { label: "Paid", val: "21" },
+                  { label: "Awaiting Payment", val: "8" }
+                ]} 
+              />
+
+              {/* 5. Business Performance */}
+              <StatCard 
+                title="Revenue" 
+                value="$12,234.00" 
+                trend="+15%"
+                isUp={true}
+                rows={[
+                  { label: "Subscriptions", val: "$4,500.00" },
+                  { label: "Commissions", val: "$7,734.00" },
+                  { label: "Net Profit", val: "$8,450.00" }
+                ]} 
+              />
+
+              {/* 6. Expenses */}
+              <StatCard 
+                title="Expenses" 
+                value="$1,200.00" 
+                trend="+5%"
+                isUp={false}
+                rows={[
+                  { label: "This Week", val: "$1,200.00" }
+                ]} 
+              />
+            </div>
+
+            {/* PHẦN BIỂU ĐỒ */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <ChartPlaceholder 
+                title="Clients by Service" 
+                emptyText="No client data available" 
+              />
+              <ChartPlaceholder 
+                title="Cumulative Client Growth" 
+                emptyText="No client trend data available" 
+              />
+            </div>
+          </div>
+        </main>
+      </main>
     </div>
   );
 }
 
-// --- HELPER COMPONENTS ---
-
-function SoftStatCard({ title, value, change, icon, color, isNegative = false }: any) {
+function StatCard({ title, value, rows, highlight = false, trend, isUp }) {
   return (
-    <Card className="border-none shadow-xl shadow-slate-200/40 rounded-[24px] bg-white transition-all hover:-translate-y-1">
-      <CardContent className="p-5 flex items-center justify-between">
-        <div>
-          <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{title}</p>
-          <div className="flex items-center gap-2">
-            <h3 className="text-xl font-black text-slate-800 leading-none">{value}</h3>
-            <span className={`text-[10px] font-bold ${isNegative ? 'text-red-500' : 'text-green-500'}`}>{change}</span>
+    <div className={`rounded-md border text-card-foreground cursor-pointer transition-all duration-200 hover:shadow-md ${highlight ? 'ring-2 ring-blue-500 bg-blue-50' : 'bg-card'}`}>
+      <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="tracking-tight text-sm font-medium">{title}</div>
+        <div className="flex items-center gap-2">
+          <button className="inline-flex items-center justify-center rounded-md text-xs h-6 w-6 p-0 hover:bg-accent">
+            <ExternalLink className="lucide lucide-external-link h-3 w-3" />
+          </button>
+        </div>
+      </div>
+      <div className="p-6 pt-0">
+        <div className="flex items-baseline gap-2">
+          <div className="text-2xl font-bold">{value}</div>
+        
+          <div className={`flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isUp ? 'text-emerald-600 bg-emerald-50' : 'text-rose-500 bg-rose-50'}`}>
+            {isUp ? <TrendingUp className="h-2.5 w-2.5 mr-0.5" /> : <TrendingDown className="h-2.5 w-2.5 mr-0.5" />}
+            {trend}
           </div>
         </div>
-        <div className={`w-11 h-11 ${color} rounded-2xl flex items-center justify-center text-white shadow-lg shadow-inner`}>
-          {icon}
+        <div className="space-y-1 pt-2 border-t border-gray-100 mt-2">
+          <div className="text-xs font-medium text-muted-foreground mb-1"></div>
+          {rows.map((row, i) => (
+            <div key={i} className="flex justify-between items-center text-xs">
+              <span className="font-medium">{row.label}</span>
+              <span className="text-muted-foreground">{row.val}</span>
+            </div>
+          ))}
         </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function MiniStat({ label, val }: any) {
-  return (
-    <div>
-      <p className="text-[10px] font-bold text-white/50 uppercase">{label}</p>
-      <p className="text-sm font-black text-white">{val}</p>
+      </div>
     </div>
   );
 }
 
-function OrderItem({ text, time, color }: any) {
+function ChartPlaceholder({ title, emptyText }) {
   return (
-    <div className="flex gap-4">
-      <div className={`mt-1 w-2 h-2 rounded-full ${color.replace('text', 'bg')} shadow-lg shadow-current/20 flex-shrink-0`}></div>
-      <div>
-        <p className="text-sm font-bold text-slate-700 leading-none mb-1">{text}</p>
-        <p className="text-[11px] font-bold text-slate-300 uppercase">{time}</p>
+    <div className="rounded-md border bg-card text-card-foreground">
+      <div className="space-y-1.5 p-6 flex flex-row items-center justify-between">
+        <div className="font-semibold leading-none tracking-tight">{title}</div>
+        <button className="inline-flex items-center justify-center rounded-md text-xs h-8 w-8 p-0 hover:bg-accent">
+          <ExternalLink className="lucide lucide-external-link h-4 w-4" />
+        </button>
+      </div>
+      <div className="p-6 pt-0">
+        <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+          <div className="text-center">
+            <Users className="lucide lucide-users h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>{emptyText}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
