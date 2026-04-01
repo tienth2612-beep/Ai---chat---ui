@@ -224,7 +224,19 @@ export default function HitradiesDashboard() {
 
 // --- SUB-COMPONENTS ---
 
-function StatCard({ title, value, rows, trend, isUp, isActive, onClick, detailHref, tooltipMsg }) {
+type StatCardProps = {
+  title: string;
+  value: string;
+  rows: Array<{ label: string; val: string }>;
+  trend: string;
+  isUp: boolean;
+  isActive: boolean;
+  onClick: () => void;
+  detailHref: string;
+  tooltipMsg?: string;
+};
+
+function StatCard({ title, value, rows, trend, isUp, isActive, onClick, detailHref, tooltipMsg }: StatCardProps) {
   return (
     <div 
       onClick={onClick}
@@ -273,7 +285,15 @@ function StatCard({ title, value, rows, trend, isUp, isActive, onClick, detailHr
   );
 }
 
-function BarColumn({ label, value, total, color, isCurrency = false }) {
+type BarColumnProps = {
+  label: string;
+  value: number;
+  total: number;
+  color: string;
+  isCurrency?: boolean;
+};
+
+function BarColumn({ label, value, total, color, isCurrency = false }: BarColumnProps) {
   const heightPercent = Math.min((value / total) * 180 * 1.2, 180); 
   const displayValue = isCurrency ? `$${value.toLocaleString()}` : value;
 
@@ -293,7 +313,12 @@ function BarColumn({ label, value, total, color, isCurrency = false }) {
   );
 }
 
-function LegendItem({ color, label }) {
+type LegendItemProps = {
+  color: string;
+  label: string;
+};
+
+function LegendItem({ color, label }: LegendItemProps) {
   return (
     <div className="flex items-center gap-1.5">
       <div className={`size-2 rounded-full ${color}`} />
@@ -302,7 +327,14 @@ function LegendItem({ color, label }) {
   );
 }
 
-function MiniMetricCard({ label, value, sub, color }) {
+type MiniMetricCardProps = {
+  label: string;
+  value: string;
+  sub: string;
+  color: string;
+};
+
+function MiniMetricCard({ label, value, sub, color }: MiniMetricCardProps) {
   return (
     <div className="p-4 bg-zinc-50 border border-zinc-100 rounded-xl">
       <p className="text-[10px] font-bold text-zinc-500 uppercase">{label}</p>
@@ -314,7 +346,12 @@ function MiniMetricCard({ label, value, sub, color }) {
   );
 }
 
-function QuickActionItem({ name, desc }) {
+type QuickActionItemProps = {
+  name: string;
+  desc: string;
+};
+
+function QuickActionItem({ name, desc }: QuickActionItemProps) {
   return (
     <div className="flex items-center justify-between p-3 border border-zinc-100 rounded-xl hover:bg-zinc-50 group cursor-pointer transition-colors">
       <div className="flex flex-col">
@@ -328,7 +365,13 @@ function QuickActionItem({ name, desc }) {
   );
 }
 
-function ActivityDot({ label, time, color }) {
+type ActivityDotProps = {
+  label: string;
+  time: string;
+  color: string;
+};
+
+function ActivityDot({ label, time, color }: ActivityDotProps) {
   return (
     <div className="flex items-start gap-4">
       <div className={`mt-1.5 size-2 rounded-full shrink-0 ${color} shadow-[0_0_10px_rgba(0,0,0,0.1)]`} />
