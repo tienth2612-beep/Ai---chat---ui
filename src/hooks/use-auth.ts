@@ -91,7 +91,10 @@ export function useAuth() {
             setError(null);
 
             try {
-                const response = await authService.googleLogin(token);
+                const response = await authService.googleLogin({
+                    credential: token,
+                    referralCode: "",
+                });
 
                 if (response.isSuccess && response.data) {
                     // Set user data
