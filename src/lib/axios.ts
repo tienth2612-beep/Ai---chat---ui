@@ -3,7 +3,7 @@ import axios from "axios";
 // var baseUrl =
 //     process.env.NEXT_PUBLIC_API_URL ||
 //     "https://hitradies-backoffice-api-9zcxn.ondigitalocean.app/api/";
-const baseUrl = "https://localhost:7003/api/";
+const baseUrl = "https://api-backoffice.hitradies.com/api";
 // Create axios instance with default config
 const api = axios.create({
     baseURL: baseUrl,
