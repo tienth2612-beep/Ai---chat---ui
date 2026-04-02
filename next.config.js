@@ -1,24 +1,31 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // images: {
-    //     remotePatterns: [
-    //         {
-    //             protocol: "https",
-    //             hostname: "**",
-    //         },
-    //     ],
-    //     unoptimized: true,
-    // },
-    // env: {
-    //     API_URL: process.env.API_URL,
-    // },
-    //output: 'export',
-    //distDir: 'build/client',
+    // 1. QUAN TRỌNG NHẤT: Chuyển sang chế độ export tĩnh
+    output: 'export', 
+
+    // 2. Bắt buộc khi dùng output: 'export' nếu bạn có dùng thẻ <Image />
+    // Vì export tĩnh không có server Node.js để tối ưu ảnh realtime
+    images: {
+        unoptimized: true,
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "**",
+            },
+        ],
+    },
+
+    // 3. Giữ lại các env nếu cần dùng ở client side
+    env: {
+        API_URL: process.env.API_URL,
+    },
+
+    // 4. Tùy chọn: folder chứa kết quả build (mặc định là 'out')
+    // distDir: 'build/client', 
+
     eslint: {
-        // Warning: This allows production builds to successfully complete even if
-        // your project has ESLint errors.
         ignoreDuringBuilds: true,
     }
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;

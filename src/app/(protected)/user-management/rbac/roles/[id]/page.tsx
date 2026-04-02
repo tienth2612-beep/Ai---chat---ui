@@ -1,17 +1,14 @@
-import { RoleDetail } from "@/components/rbac/role-detail";
-import { Separator } from "@/components/ui/separator";
+import RoleDetailPageClient from "./role-detail-page-client";
 
-export default function RoleDetailPage({ params }: { params: { id: string } }) {
-    return (
-        <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">Role Details</h3>
-                <p className="text-sm text-muted-foreground">
-                    View role information and assigned permissions.
-                </p>
-            </div>
-            <Separator />
-            <RoleDetail id={params.id} />
-        </div>
-    );
+/** Required for `output: 'export'`. */
+export function generateStaticParams() {
+    return [{ id: "0" }];
+}
+
+export default function RoleDetailPage({
+    params,
+}: {
+    params: { id: string };
+}) {
+    return <RoleDetailPageClient id={params.id} />;
 }

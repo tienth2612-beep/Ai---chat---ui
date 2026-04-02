@@ -1,19 +1,10 @@
-"use client";
+import EditWelcomeQuestionRedirectClient from "./edit-welcome-question-redirect-client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+/** Required for `output: 'export'`. */
+export function generateStaticParams() {
+    return [{ id: "0" }];
+}
 
 export default function EditWelcomeQuestionPage() {
-    const router = useRouter();
-
-    useEffect(() => {
-        // Redirect to new common questions page
-        router.replace("/settings/common-questions");
-    }, [router]);
-
-    return (
-        <div className="flex items-center justify-center h-64">
-            <p>Redirecting to Common Questions...</p>
-        </div>
-    );
+    return <EditWelcomeQuestionRedirectClient />;
 }

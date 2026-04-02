@@ -1,12 +1,15 @@
 import { AuthUserForm } from "@/components/auth-users/auth-user-form";
 
-interface EditAuthUserPageProps {
-    params: {
-        id: string;
-    };
+/** Placeholder so `output: 'export'` has ≥1 prerender path; real IDs load client-side. */
+export function generateStaticParams() {
+    return [{ id: "0" }];
 }
 
-export default function EditAuthUserPage({ params }: EditAuthUserPageProps) {
+export default function EditAuthUserPage({
+    params,
+}: {
+    params: { id: string };
+}) {
     return (
         <div className="space-y-6">
             <div>

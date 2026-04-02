@@ -1,19 +1,12 @@
-"use client";
+// 1. CHÚ Ý: Không có dòng "use client" ở đầu file này
+import WelcomeQuestionRedirect from "./welcome-redirect-client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+// 2. THÊM HÀM NÀY: Để Next.js build ra file tĩnh cho folder [id]
+export function generateStaticParams() {
+    return [{ id: "0" }];
+}
 
 export default function WelcomeQuestionDetailsPage() {
-    const router = useRouter();
-
-    useEffect(() => {
-        // Redirect to new common questions page
-        router.replace("/settings/common-questions");
-    }, [router]);
-
-    return (
-        <div className="flex items-center justify-center h-64">
-            <p>Redirecting to Common Questions...</p>
-        </div>
-    );
+    // 3. Gọi Component Client để thực hiện redirect
+    return <WelcomeQuestionRedirect />;
 }

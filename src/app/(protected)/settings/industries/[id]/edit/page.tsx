@@ -1,5 +1,10 @@
 import { IndustryForm } from "@/components/industries/industry-form";
 
+/** Required for `output: 'export'`. */
+export function generateStaticParams() {
+    return [{ id: "0" }];
+}
+
 interface EditIndustryPageProps {
     params: {
         id: string;

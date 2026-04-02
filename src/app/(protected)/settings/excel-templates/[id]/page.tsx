@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+// 1. THÊM HÀM NÀY: Chìa khóa để build SPA (output: export) thành công.
+// Nó báo cho Next.js tạo 1 file HTML mẫu cho folder [id] này.
+export function generateStaticParams() {
+    return [{ id: "0" }];
+}
+
+// 2. Nhận id trực tiếp từ params (dạng string, không cần mảng nữa)
 interface TemplateDetailPageProps {
     params: {
         id: string;
@@ -12,9 +19,15 @@ interface TemplateDetailPageProps {
 export default function TemplateDetailPage({
     params,
 }: TemplateDetailPageProps) {
+    // params.id ở đây chắc chắn là string
+    const templateId = params.id;
+
+    if (!templateId) {
+        return <div>Template not found</div>;
+    }
+
     return (
         <>
-            {/* <main className="container mx-auto py-10 px-4 md:px-6"> */}
             <div className="flex items-center gap-4 mb-6">
                 <Link href="/settings/excel-templates">
                     <Button variant="ghost" size="icon">
@@ -27,8 +40,8 @@ export default function TemplateDetailPage({
                     template.
                 </p>
             </div>
-            <TemplateDetail templateId={params.id} />
-            {/* </main> */}
+            {/* Truyền templateId trực tiếp vào component con */}
+            <TemplateDetail templateId={templateId} />
         </>
     );
 }

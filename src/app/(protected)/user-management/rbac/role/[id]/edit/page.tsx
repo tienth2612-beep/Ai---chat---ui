@@ -1,27 +1,14 @@
-import { RoleForm } from "@/components/rbac/role-form";
-import { Separator } from "@/components/ui/separator";
-import { useParams } from "next/navigation";
-import { useRbac } from "@/hooks/use-rbac";
+import EditRolePageClient from "../../../roles/[id]/edit/edit-role-page-client";
 
-export default async function EditRolePage() {
-    var params = useParams();
-    const { getRole } = useRbac();
-    const role = await getRole(Number(params.id));
+/** Required for `output: 'export'`. */
+export function generateStaticParams() {
+    return [{ id: "0" }];
+}
 
-    if (!role) {
-        return <div>Role not found</div>;
-    }
-
-    return (
-        <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">Edit Role</h3>
-                <p className="text-sm text-muted-foreground">
-                    Edit role details and assigned permissions.
-                </p>
-            </div>
-            <Separator />
-            <RoleForm role={role} isEditing={true} />
-        </div>
-    );
+export default function EditRolePage({
+    params,
+}: {
+    params: { id: string };
+}) {
+    return <EditRolePageClient id={params.id} />;
 }
