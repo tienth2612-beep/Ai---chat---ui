@@ -1,15 +1,69 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { 
   PanelLeft, Search, CircleHelp, Settings, ExternalLink, TrendingUp, TrendingDown, 
   Users, UserCheck, Clock, UserX, Building2, ShieldCheck, BarChart3, Receipt, 
-  DollarSign, Wallet, ArrowUpRight, History 
+  DollarSign, Wallet, ArrowUpRight, History, Calendar, ChevronDown 
 } from "lucide-react";
+
+/** 6 tháng gần nhất: nhãn T1…T12 (theo tháng thực), dùng cho biểu đồ xu hướng — không phụ thuộc bộ lọc ngày. */
+function getRollingSixMonthLabels(): string[] {
+  const now = new Date();
+  const labels: string[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    labels.push(`T${d.getMonth() + 1}`);
+  }
+  return labels;
+}
+
+/**
+ * Doanh thu MTD (cộng dồn trong tháng, reset tháng mới).
+ * Mock: khi có API, thay bằng dữ liệu thật theo tháng hiện tại.
+ */
+function getMtdRevenueMock() {
+  return { sub: 3200, comm: 5100, profit: 5600 };
+}
 
 export default function HitradiesDashboard() {
   const [activeTab, setActiveTab] = useState("users");
+  
+  const [dateRange, setDateRange] = useState("This Month");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  /** Chỉ ảnh hưởng: 3 ô Đăng ký / Hoa hồng / Lợi nhuận + biểu đồ cột so sánh. */
+  const dateFilteredData = useMemo(() => {
+    const revenueData: Record<string, { sub: number; comm: number; profit: number; bars: [number, number, number] }> = {
+      Today: { sub: 150, comm: 240, profit: 310, bars: [30, 50, 65] },
+      Yesterday: { sub: 140, comm: 220, profit: 290, bars: [25, 45, 60] },
+      "Last Week": { sub: 890, comm: 1200, profit: 1350, bars: [38, 55, 62] },
+      "Last Month": { sub: 4100, comm: 6900, profit: 7200, bars: [42, 78, 85] },
+      "Last Quarter": { sub: 12000, comm: 21000, profit: 24000, bars: [48, 80, 90] },
+      "Last Year": { sub: 38000, comm: 65000, profit: 72000, bars: [55, 85, 92] },
+      "This Week": { sub: 620, comm: 980, profit: 1100, bars: [35, 52, 58] },
+      "This Month": { sub: 4500, comm: 7734, profit: 8450, bars: [45, 82, 88] },
+      "This Quarter": { sub: 13200, comm: 22800, profit: 25100, bars: [50, 84, 91] },
+      "This Year": { sub: 45000, comm: 72000, profit: 89000, bars: [52, 86, 93] },
+      "All Time": { sub: 45000, comm: 72000, profit: 89000, bars: [50, 75, 95] },
+    };
+    return revenueData[dateRange] ?? revenueData["This Month"];
+  }, [dateRange]);
+
+  /** Xu hướng 6 tháng — cố định theo cửa sổ lăn, không đổi khi đổi date filter. */
+  const sixMonthTrend = useMemo(() => {
+    const values = [8.2, 9.1, 10.4, 11.2, 12.0, 12.8];
+    const max = Math.max(...values, 0.001);
+    return { values, labels: getRollingSixMonthLabels(), max };
+  }, []);
+
+  const mtdRevenue = useMemo(() => getMtdRevenueMock(), []);
+
+  const dateOptions = [
+    "Today", "Yesterday", "Last Week", "Last Month", "Last Quarter", 
+    "Last Year", "This Week", "This Month", "This Quarter", "This Year", "All Time"
+  ];
 
   return (
     <div className="group/sidebar-wrapper flex min-h-svh w-full bg-background">
@@ -63,19 +117,19 @@ export default function HitradiesDashboard() {
               rows={[{ label: "Active", val: "12" }, { label: "Inactive", val: "6" }, { label:"Pending Review", val: "5"}]} 
             />
             <StatCard 
-              title="Revenue" value="$12,234" trend="+15%" isUp={true} 
+              title="Revenue" value={`$${(mtdRevenue.sub + mtdRevenue.comm).toLocaleString()}`} trend="+15%" isUp={true} 
               isActive={activeTab === "revenue"} 
               onClick={() => setActiveTab("revenue")}
               detailHref="/admin/finance"
-              tooltipMsg="Xem báo cáo doanh thu chi tiết"
-              rows={[{ label: "Subscriptions", val: "$4,500" }, { label: "Commissions", val: "$7,734" }, { label: "Net Profit", val: "$8,450"}]} 
+              tooltipMsg="Tổng MTD trong tháng (cộng dồn theo ngày, reset tháng mới)"
+              rows={[{ label: "Subscriptions", val: `$${mtdRevenue.sub.toLocaleString()}` }, { label: "Commissions", val: `$${mtdRevenue.comm.toLocaleString()}` }, { label: "Net Profit", val: `$${mtdRevenue.profit.toLocaleString()}`}]} 
             />
           </div>
 
           {/* HÀNG DƯỚI: NỘI DUNG CHI TIẾT THEO TAB */}
           <div className="grid gap-4 md:grid-cols-3">
             
-            <div className="md:col-span-2 rounded-2xl border bg-white p-6 shadow-sm min-h-[420px]">
+            <div className="md:col-span-2 rounded-2xl border bg-white p-6 sm:p-8 shadow-sm min-h-[420px] min-w-0 overflow-hidden">
               
               {/* --- TAB 1: USERS ANALYTICS --- */}
               {activeTab === "users" && (
@@ -146,53 +200,146 @@ export default function HitradiesDashboard() {
                 </div>
               )}
 
-              {/* --- TAB 3: REVENUE ANALYTICS --- */}
+              {/* --- TAB 3: REVENUE ANALYTICS (PHẦN THAY ĐỔI THEO YÊU CẦU) --- */}
               {activeTab === "revenue" && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-8">
-                  <div className="flex items-center justify-between">
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 min-w-0">
+                  {/* Header Phân tích doanh thu & Date Range */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                     <div>
-                      <h2 className="text-lg font-bold text-emerald-600">Financial Statistics</h2>
-                      <p className="text-xs text-zinc-500 font-medium">Revenue streams: Subscriptions vs Commissions</p>
+                      <h2 className="text-xl font-bold text-zinc-900">Phân tích doanh thu</h2>
+                      <p className="text-sm text-zinc-500">
+                        Bộ lọc ngày chỉ áp dụng cho 3 ô (Đăng ký / Hoa hồng / Lợi nhuận) và biểu đồ cột. Ô Revenue phía trên = tổng MTD tháng hiện tại; biểu đồ 6 tháng luôn là 6 tháng lăn gần nhất.
+                      </p>
                     </div>
-                    <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold border border-emerald-100">
-                      CURRENCY: USD ($)
+
+                    {/* Bộ lọc Date Range (Image 2) */}
+                    <div className="relative">
+                      <button 
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="flex items-center justify-between w-full md:w-56 px-4 py-2 bg-white border rounded-lg shadow-sm text-sm hover:bg-zinc-50 transition-all"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Calendar className="size-4 text-zinc-500" />
+                          <span className="font-medium">{dateRange}</span>
+                        </div>
+                        <ChevronDown className={`size-4 text-zinc-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {isDropdownOpen && (
+                        <div className="absolute right-0 mt-2 w-full md:w-56 bg-white border rounded-xl shadow-xl z-50 overflow-hidden py-1">
+                          {dateOptions.map((option) => (
+                            <button
+                              key={option}
+                              onClick={() => {
+                                setDateRange(option);
+                                setIsDropdownOpen(false);
+                              }}
+                              className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${dateRange === option ? 'bg-blue-50 text-blue-600 font-bold' : 'hover:bg-zinc-50 text-zinc-700'}`}
+                            >
+                              {option}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-end">
-                    <div className="lg:col-span-2 bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100/50">
-                      <div className="flex items-end justify-around h-48 gap-8 px-8 relative">
-                        <div className="absolute inset-x-0 top-0 h-px bg-emerald-200/20" />
-                        <div className="absolute inset-x-0 top-2/4 h-px bg-emerald-200/20" />
-                        <BarColumn label="Subs" value={4500} total={12234} color="bg-emerald-600" isCurrency />
-                        <BarColumn label="Comm" value={7734} total={12234} color="bg-blue-500" isCurrency />
-                        <BarColumn label="Net Profit" value={8450} total={12234} color="bg-emerald-400" isCurrency />
-                      </div>
-                      <div className="mt-8 flex justify-center gap-6">
-                         <LegendItem color="bg-emerald-600" label="SUBSCRIPTIONS" />
-                         <LegendItem color="bg-blue-500" label="COMMISSIONS" />
-                         <LegendItem color="bg-emerald-400" label="NET PROFIT" />
+                  {/* Top 3 Summary Boxes — theo bộ lọc ngày */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 min-w-0">
+                    <div className="bg-indigo-50/30 border border-indigo-100 rounded-xl p-5 text-center shadow-sm min-w-0">
+                      <span className="text-xl sm:text-2xl font-bold text-indigo-600 block mb-1 tabular-nums">${dateFilteredData.sub.toLocaleString()}.00</span>
+                      <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Đăng ký</span>
+                    </div>
+                    <div className="bg-emerald-50/30 border border-emerald-100 rounded-xl p-5 text-center shadow-sm min-w-0">
+                      <span className="text-xl sm:text-2xl font-bold text-emerald-500 block mb-1 tabular-nums">${dateFilteredData.comm.toLocaleString()}.00</span>
+                      <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Hoa hồng</span>
+                    </div>
+                    <div className="bg-amber-50/30 border border-amber-100 rounded-xl p-5 text-center shadow-sm min-w-0">
+                      <span className="text-xl sm:text-2xl font-bold text-amber-500 block mb-1 tabular-nums">${dateFilteredData.profit.toLocaleString()}.00</span>
+                      <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Lợi nhuận</span>
+                    </div>
+                  </div>
+
+                  {/* Biểu đồ */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-2 min-w-0">
+                    
+                    {/* Xu hướng 6 tháng — không phụ thuộc date filter */}
+                    <div className="space-y-3 min-w-0">
+                      <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">XU HƯỚNG DOANH THU 6 THÁNG</h3>
+                      <div className="rounded-xl border border-zinc-100 bg-zinc-50/30 p-4 pl-12 pr-3 pb-10 pt-2 min-w-0 overflow-hidden">
+                        <div className="relative h-44 w-full">
+                          <svg
+                            className="h-full w-full"
+                            viewBox="0 0 280 140"
+                            preserveAspectRatio="xMidYMid meet"
+                            role="img"
+                            aria-label="Xu hướng doanh thu 6 tháng"
+                          >
+                            {(() => {
+                              const pad = 12;
+                              const w = 280 - pad * 2;
+                              const h = 140 - pad * 2;
+                              const vals = sixMonthTrend.values;
+                              const maxV = sixMonthTrend.max;
+                              const pts = vals.map((v, i) => {
+                                const x = pad + (i / Math.max(vals.length - 1, 1)) * w;
+                                const y = pad + h - (v / maxV) * h;
+                                return `${x},${y}`;
+                              });
+                              return (
+                                <>
+                                  <polyline fill="none" stroke="#6366f1" strokeWidth="2" points={pts.join(" ")} vectorEffect="non-scaling-stroke" />
+                                  {vals.map((v, i) => {
+                                    const x = pad + (i / Math.max(vals.length - 1, 1)) * w;
+                                    const y = pad + h - (v / maxV) * h;
+                                    return (
+                                      <circle key={i} cx={x} cy={y} r="4" fill="white" stroke="#6366f1" strokeWidth="2" />
+                                    );
+                                  })}
+                                </>
+                              );
+                            })()}
+                          </svg>
+                          <div className="pointer-events-none absolute left-0 top-0 flex h-[calc(100%-2rem)] flex-col justify-between text-[10px] font-bold text-zinc-400 -translate-x-10 w-8 text-right">
+                            <span>{`$${Math.ceil(sixMonthTrend.max)}k`}</span>
+                            <span>{`$${Math.round(sixMonthTrend.max * 0.75)}k`}</span>
+                            <span>{`$${Math.round(sixMonthTrend.max * 0.5)}k`}</span>
+                            <span>{`$${Math.round(sixMonthTrend.max * 0.25)}k`}</span>
+                            <span>$0k</span>
+                          </div>
+                          <div className="absolute bottom-0 left-12 right-2 flex justify-between text-[10px] font-bold text-zinc-400">
+                            {sixMonthTrend.labels.map((lb) => (
+                              <span key={lb} className="min-w-0 truncate text-center flex-1">{lb}</span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Quick Audit</h3>
-                      <div className="p-4 bg-emerald-600 rounded-xl text-white shadow-lg shadow-emerald-100">
-                        <div className="flex items-center gap-2 mb-1">
-                          <DollarSign className="size-3 opacity-80" />
-                          <p className="text-[10px] font-bold uppercase opacity-80">Profit Margin</p>
+                    {/* So sánh nguồn thu — theo bộ lọc ngày */}
+                    <div className="space-y-3 min-w-0">
+                      <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">SO SÁNH NGUỒN THU</h3>
+                      <div className="rounded-xl border border-zinc-100 bg-zinc-50/30 p-4 pl-12 pr-4 pb-10 pt-2 min-h-[11rem] min-w-0 overflow-hidden">
+                        <div className="relative flex h-44 items-end justify-around gap-2 px-1">
+                          <div className="pointer-events-none absolute left-0 top-0 flex h-full flex-col justify-between text-[10px] font-bold text-zinc-400 -translate-x-10 w-8 text-right">
+                            <span>$10k</span>
+                            <span>$8k</span>
+                            <span>$5k</span>
+                            <span>$3k</span>
+                            <span>$0k</span>
+                          </div>
+                          <div className="bg-indigo-500 w-[22%] max-w-16 min-w-10 rounded-t-sm transition-all duration-700" style={{ height: `${dateFilteredData.bars[0]}%` }} />
+                          <div className="bg-emerald-500 w-[22%] max-w-16 min-w-10 rounded-t-sm transition-all duration-700" style={{ height: `${dateFilteredData.bars[1]}%` }} />
+                          <div className="bg-amber-500 w-[22%] max-w-16 min-w-10 rounded-t-sm transition-all duration-700" style={{ height: `${dateFilteredData.bars[2]}%` }} />
                         </div>
-                        <p className="text-2xl font-black">69.1%</p>
-                        <p className="text-[10px] mt-2 font-medium opacity-90">Healthy cashflow detected</p>
-                      </div>
-                      <div className="p-4 bg-white border border-zinc-100 rounded-xl">
-                        <p className="text-[10px] font-bold text-zinc-400 uppercase">Avg. Deal Size</p>
-                        <p className="text-xl font-bold text-zinc-800">$489.36</p>
-                        <div className="flex items-center gap-1 text-emerald-500 text-[10px] font-bold mt-1">
-                          <ArrowUpRight className="size-3" /> +5% vs LY
+                        <div className="mt-2 flex justify-around gap-1 text-[10px] font-bold text-zinc-400 px-1">
+                          <span className="w-[22%] max-w-16 text-center truncate">Đăng ký</span>
+                          <span className="w-[22%] max-w-16 text-center truncate">Hoa hồng</span>
+                          <span className="w-[22%] max-w-16 text-center truncate">Lợi nhuận</span>
                         </div>
                       </div>
                     </div>
+
                   </div>
                 </div>
               )}
@@ -222,7 +369,7 @@ export default function HitradiesDashboard() {
   );
 }
 
-// --- SUB-COMPONENTS ---
+// --- SUB-COMPONENTS (GIỮ NGUYÊN) ---
 
 type StatCardProps = {
   title: string;
@@ -246,7 +393,6 @@ function StatCard({ title, value, rows, trend, isUp, isActive, onClick, detailHr
       <div className="flex items-center justify-between mb-2">
         <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-blue-600' : 'text-zinc-400'}`}>{title}</span>
         
-        {/* Nút góc phải với Tooltip */}
         <div className="relative group/btn">
           <Link 
             href={detailHref} 
@@ -256,11 +402,9 @@ function StatCard({ title, value, rows, trend, isUp, isActive, onClick, detailHr
             <ExternalLink className="size-3.5" />
           </Link>
 
-          {/* Dòng thông báo khi hover */}
           <div className="absolute bottom-full right-0 mb-2 hidden group-hover/btn:block z-50 animate-in fade-in slide-in-from-bottom-1 duration-200">
              <div className="bg-zinc-800 text-white text-[10px] font-bold py-1 px-2 rounded whitespace-nowrap shadow-xl">
                {tooltipMsg || "Xem chi tiết"}
-               {/* Mũi tên nhỏ */}
                <div className="absolute top-full right-2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-zinc-800"></div>
              </div>
           </div>
@@ -290,17 +434,15 @@ type BarColumnProps = {
   value: number;
   total: number;
   color: string;
-  isCurrency?: boolean;
 };
 
-function BarColumn({ label, value, total, color, isCurrency = false }: BarColumnProps) {
+function BarColumn({ label, value, total, color }: BarColumnProps) {
   const heightPercent = Math.min((value / total) * 180 * 1.2, 180); 
-  const displayValue = isCurrency ? `$${value.toLocaleString()}` : value;
 
   return (
     <div className="relative flex flex-col items-center group w-full max-w-[50px]">
       <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-800 text-white text-[10px] font-bold px-2 py-1 rounded z-20 whitespace-nowrap shadow-xl">
-        {displayValue}
+        {value}
       </div>
       <div 
         className={`${color} w-full rounded-t-lg shadow-lg shadow-black/5 transition-all duration-1000 ease-out relative z-10`}
