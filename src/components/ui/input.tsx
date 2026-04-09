@@ -1,13 +1,13 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-// Sử dụng React.forwardRef để truyền ref từ react-hook-form vào thẻ input
+// Use React.forwardRef so react-hook-form can pass refs into input
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (
       <input
         type={type}
-        ref={ref} // CỰC KỲ QUAN TRỌNG: Dòng này giúp react-hook-form "nhìn" thấy dữ liệu
+        ref={ref} // Critical: this lets react-hook-form read the input value
         data-slot="input"
         className={cn(
           "h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30",

@@ -250,7 +250,7 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
                                         : "opacity-100"
                                 )}
                             >
-                                Hi Tradies
+                                HiTradies
                             </h1>
                         </div>
                     </div>
